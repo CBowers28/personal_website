@@ -116,6 +116,7 @@ export default function Home() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [heroColorIdx, setHeroColorIdx] = useState(2);
+  const [eduModal, setEduModal] = useState<"bs" | "ms" | null>(null);
 
   const heroPantone = HERO_COLORS[heroColorIdx];
 
@@ -621,6 +622,172 @@ export default function Home() {
           letter-spacing: 0.06em;
         }
 
+        /* ── EDU MODAL ── */
+        .edu-modal-backdrop {
+          position: fixed;
+          inset: 0;
+          background: rgba(26,26,24,0.5);
+          z-index: 100;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 2rem;
+          backdrop-filter: blur(4px);
+        }
+
+        .edu-modal {
+          background: var(--bg);
+          max-width: 680px;
+          width: 100%;
+          max-height: 90vh;
+          overflow-y: auto;
+          box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+          position: relative;
+        }
+
+        .edu-modal-close {
+          position: absolute;
+          top: 0.75rem;
+          right: 0.75rem;
+          background: var(--bg);
+          border: 1.5px solid rgba(26,26,24,0.15);
+          width: 32px;
+          height: 32px;
+          cursor: pointer;
+          font-size: 1rem;
+          color: var(--subtle);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.15s;
+          z-index: 10;
+        }
+
+        .edu-modal-close:hover {
+          border-color: var(--ink);
+          color: var(--ink);
+        }
+
+        /* ── EDUCATION CARDS ── */
+        .edu-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1.5rem;
+        }
+
+        .edu-card {
+          background: #fff;
+          border: 1.5px solid rgba(26,26,24,0.08);
+          overflow: hidden;
+        }
+
+        .edu-card-header {
+          padding: 1.4rem 3.5rem 1.2rem 1.5rem;
+          border-bottom: 1.5px solid rgba(26,26,24,0.06);
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .edu-card-degree {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
+          color: var(--ink);
+          line-height: 1.2;
+        }
+
+        .edu-card-school {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.58rem;
+          color: var(--subtle);
+          letter-spacing: 0.06em;
+          margin-top: 4px;
+        }
+
+        .edu-card-gpa {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 2rem;
+          letter-spacing: 0.04em;
+          color: var(--ink);
+          line-height: 1;
+          flex-shrink: 0;
+        }
+
+        .edu-card-gpa-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.5rem;
+          color: var(--subtle);
+          letter-spacing: 0.08em;
+          text-align: right;
+          margin-top: 2px;
+        }
+
+        .edu-card-body {
+          padding: 1.2rem 1.5rem 1.4rem;
+        }
+
+        .edu-courses-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.55rem;
+          color: var(--subtle);
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          margin-bottom: 0.75rem;
+        }
+
+        .edu-courses {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem;
+        }
+
+        .edu-course-chip {
+          display: flex;
+          align-items: center;
+          gap: 0.35rem;
+          background: var(--bg);
+          border: 1px solid rgba(26,26,24,0.1);
+          padding: 0.3rem 0.65rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.55rem;
+          color: var(--ink);
+          letter-spacing: 0.04em;
+        }
+
+        .edu-course-grade {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.6rem;
+          font-weight: 700;
+          padding: 1px 4px;
+          border-radius: 2px;
+        }
+
+        .edu-honors {
+          margin-top: 1rem;
+          padding-top: 0.75rem;
+          border-top: 1px solid rgba(26,26,24,0.06);
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem;
+        }
+
+        .edu-honor-tag {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.52rem;
+          letter-spacing: 0.06em;
+          color: var(--subtle);
+          border: 1px solid rgba(26,26,24,0.12);
+          padding: 0.25rem 0.6rem;
+        }
+
+        @media (max-width: 768px) {
+          .edu-grid { grid-template-columns: 1fr; }
+        }
+
         /* ── CONTACT ── */
         .contact-inner {
           display: grid;
@@ -785,9 +952,7 @@ export default function Home() {
 
           <div className="hero-aside">
             <p className="hero-body">
-              CS grad student at the University of Florida building systems that matter.
-              From NASA eye-tracking interfaces and LLM research to algorithmic investment
-              infrastructure and full-stack web platforms.
+              CS grad student at the University of Florida building systems that matter — from NASA eye-tracking interfaces and LLM research to algorithmic investment infrastructure and full-stack web platforms.
             </p>
             <div className="hero-links">
               <a href="#projects" className="btn btn-primary">View Projects</a>
@@ -884,19 +1049,37 @@ export default function Home() {
             <div className="color-key">
               <div className="key-title">Legend</div>
               <div className="key-grid">
-                {TRACKS.map((track) => (
-                    <Link key={track.label} href={track.link} className="key-item"
-                          target={track.link.startsWith("http") ? "_blank" : undefined}
-                          rel={track.link.startsWith("http") ? "noreferrer" : undefined}
-                    >
-                      <div className="key-swatch" style={{ background: track.color }} />
-                      <div className="key-text">
-                        <div className="key-name">{track.label}</div>
-                        <div className="key-sub">{track.sub}</div>
-                      </div>
-                      <span className="key-arrow">→</span>
-                    </Link>
-                ))}
+                {TRACKS.map((track) => {
+                  const isEdu = track.label === "B.S. Computer Science" || track.label === "M.S. Computer Science";
+                  const eduKey = track.label === "B.S. Computer Science" ? "bs" : "ms";
+                  if (isEdu) {
+                    return (
+                        <button key={track.label} className="key-item" style={{ border: "none", cursor: "pointer", textAlign: "left", width: "100%" }}
+                                onClick={() => setEduModal(eduKey as "bs" | "ms")}
+                        >
+                          <div className="key-swatch" style={{ background: track.color }} />
+                          <div className="key-text">
+                            <div className="key-name">{track.label}</div>
+                            <div className="key-sub">{track.sub}</div>
+                          </div>
+                          <span className="key-arrow">↗</span>
+                        </button>
+                    );
+                  }
+                  return (
+                      <Link key={track.label} href={track.link} className="key-item"
+                            target={track.link.startsWith("http") ? "_blank" : undefined}
+                            rel={track.link.startsWith("http") ? "noreferrer" : undefined}
+                      >
+                        <div className="key-swatch" style={{ background: track.color }} />
+                        <div className="key-text">
+                          <div className="key-name">{track.label}</div>
+                          <div className="key-sub">{track.sub}</div>
+                        </div>
+                        <span className="key-arrow">→</span>
+                      </Link>
+                  );
+                })}
               </div>
               <div style={{ marginTop: "1.2rem", display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
@@ -916,6 +1099,101 @@ export default function Home() {
 
           </div>
         </section>
+
+        {/* EDUCATION MODAL */}
+        {eduModal && (
+            <div className="edu-modal-backdrop" onClick={() => setEduModal(null)}>
+              <div className="edu-modal" onClick={(e) => e.stopPropagation()}>
+                <button className="edu-modal-close" onClick={() => setEduModal(null)}>✕</button>
+
+                {eduModal === "bs" && (
+                    <div className="edu-card" style={{ border: "none", boxShadow: "none" }}>
+                      <div className="edu-card-header">
+                        <div>
+                          <div className="edu-card-degree">B.S. Computer Science</div>
+                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2023–2025</div>
+                          <div className="edu-card-school" style={{ marginTop: 4 }}>Certificate: AI Fundamentals &amp; Applications · President&apos;s Honor Roll</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div className="edu-card-gpa" style={{ color: "#1B3F6B" }}>3.93</div>
+                          <div className="edu-card-gpa-label">GPA</div>
+                        </div>
+                      </div>
+                      <div className="edu-card-body">
+                        <div className="edu-courses-label">Key Coursework</div>
+                        <div className="edu-courses">
+                          {[
+                            { name: "Operating Systems", code: "COP4600", grade: "A" },
+                            { name: "Data Structures & Algorithms", code: "COP3530", grade: "B" },
+                            { name: "Computer Organization", code: "CDA3101", grade: "A" },
+                            { name: "Software Engineering", code: "CEN3031", grade: "A" },
+                            { name: "Machine Learning", code: "CIS4930", grade: "A" },
+                            { name: "AI Fundamentals", code: "EEL3872", grade: "A" },
+                            { name: "Computational Linear Algebra", code: "MAS3114", grade: "A" },
+                            { name: "Discrete Structures", code: "COT3100", grade: "B+" },
+                            { name: "Engineering Statistics", code: "STA3032", grade: "A" },
+                            { name: "Prog Fundamentals I", code: "COP3502C", grade: "A" },
+                            { name: "Prog Fundamentals II", code: "COP3503C", grade: "A" },
+                          ].map((c) => (
+                              <div key={c.code} className="edu-course-chip">
+                                <span>{c.name}</span>
+                                <span className="edu-course-grade" style={{
+                                  background: c.grade === "A" ? "#2A9D8F22" : c.grade === "B+" ? "#E8A82022" : "#7B9EB522",
+                                  color: c.grade === "A" ? "#2A9D8F" : c.grade === "B+" ? "#c8870a" : "#4a6a80",
+                                }}>{c.grade}</span>
+                              </div>
+                          ))}
+                        </div>
+                        <div className="edu-honors">
+                          <span className="edu-honor-tag">🏅 President&apos;s Honor Roll</span>
+                          <span className="edu-honor-tag">📜 AI Fundamentals Certificate</span>
+                          <span className="edu-honor-tag">149 Total Credit Hours</span>
+                        </div>
+                      </div>
+                    </div>
+                )}
+
+                {eduModal === "ms" && (
+                    <div className="edu-card" style={{ border: "none", boxShadow: "none" }}>
+                      <div className="edu-card-header">
+                        <div>
+                          <div className="edu-card-degree">M.S. Computer Science</div>
+                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2025–Present</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div className="edu-card-gpa" style={{ color: "#2A9D8F" }}>4.0</div>
+                          <div className="edu-card-gpa-label">GPA</div>
+                        </div>
+                      </div>
+                      <div className="edu-card-body">
+                        <div className="edu-courses-label">Key Coursework</div>
+                        <div className="edu-courses">
+                          {[
+                            { name: "Large Language Models", code: "CIS6930", grade: "A" },
+                            { name: "Computer Networks", code: "CNT5106C", grade: "A" },
+                            { name: "Operating Systems", code: "COP4600", grade: "A" },
+                            { name: "Programming Language Principles", code: "COP5556", grade: "IP" },
+                            { name: "Database Systems", code: "CIS4301", grade: "IP" },
+                          ].map((c) => (
+                              <div key={c.code} className="edu-course-chip">
+                                <span>{c.name}</span>
+                                <span className="edu-course-grade" style={{
+                                  background: c.grade === "A" ? "#2A9D8F22" : "#E8A82022",
+                                  color: c.grade === "A" ? "#2A9D8F" : "#c8870a",
+                                }}>{c.grade}</span>
+                              </div>
+                          ))}
+                        </div>
+                        <div className="edu-honors">
+                          <span className="edu-honor-tag">🔬 Active Researcher · Ruiz HCI Lab</span>
+                          <span className="edu-honor-tag">🔬 Active Researcher · Digital Markets Initiative</span>
+                        </div>
+                      </div>
+                    </div>
+                )}
+              </div>
+            </div>
+        )}
 
         {/* CONTACT */}
         <section id="contact" style={{ background: "rgba(0,0,0,0.02)" }}>
