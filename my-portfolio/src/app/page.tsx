@@ -127,7 +127,19 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Hash name string into a stable, vivid HSL color + fake Pantone metadata
+  useEffect(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 32;
+    canvas.height = 32;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.fillStyle = HERO_COLORS[heroColorIdx].hex;
+    ctx.fillRect(0, 0, 32, 32);
+    const link = (document.querySelector("link[rel~='icon']") as HTMLLinkElement) || document.createElement("link");
+    link.rel = "icon";
+    link.href = canvas.toDataURL("image/png");
+    document.head.appendChild(link);
+  }, [heroColorIdx]);
   const nameToColor = (name: string) => {
     if (!name.trim()) return {
       hsl: "#C8C0B0",
@@ -952,7 +964,9 @@ export default function Home() {
 
           <div className="hero-aside">
             <p className="hero-body">
-              CS grad student at the University of Florida building systems that matter — from NASA eye-tracking interfaces and LLM research to algorithmic investment infrastructure and full-stack web platforms.
+              CS graduate student at the University of Florida building systems that matter.
+              From NASA eye-tracking interfaces and LLM research to algorithmic investment
+              infrastructure and full-stack web platforms.
             </p>
             <div className="hero-links">
               <a href="#projects" className="btn btn-primary">View Projects</a>
