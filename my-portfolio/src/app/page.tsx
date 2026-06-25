@@ -108,6 +108,15 @@ const TRACKS = [
     color: "#1A6B7A",
     ongoing: true,
   },
+  {
+    label: "The Feed",
+    sub: "SWE Intern · Ops, Forecasting & Fulfillment",
+    start: toMonth(2026, 4),
+    end:   toMonth(2026, 7),
+    color: "#2A6E3F",
+    ongoing: false,
+    link: "/experience/the-feed",
+  },
 ];
 
 const YEAR_MARKS = [2022, 2023, 2024, 2025, 2026, 2027];
@@ -117,6 +126,14 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [heroColorIdx, setHeroColorIdx] = useState(2);
   const [eduModal, setEduModal] = useState<"bs" | "ms" | null>(null);
+  const [projectFilter, setProjectFilter] = useState<"All" | "Operations" | "Research" | "Publication" | "Project">("All");
+
+  const TAG_ORDER: Record<string, number> = { Operations: 0, Project: 1, Research: 2, Publication: 3 };
+  const visibleProjects = PROJECTS
+      .filter((p) => p.tag === "Research" || p.tag === "Publication" || p.showInGrid)
+      .filter((p) => projectFilter === "All" ? true : p.tag === projectFilter)
+      .slice()
+      .sort((a, b) => (TAG_ORDER[a.tag] ?? 99) - (TAG_ORDER[b.tag] ?? 99));
 
   const heroPantone = HERO_COLORS[heroColorIdx];
 
@@ -957,31 +974,107 @@ export default function Home() {
               <div className="chip-name">CHRISTOPHER BOWERS</div>
               <div className="chip-code" style={{ transition: "all 1.5s ease" }}>{heroPantone.code} · {heroPantone.name}</div>
               <div className="chip-desc">
-                SWE · Researcher · MS CS @ UF
+                Software for Operations · SWE · MS CS @ UF
               </div>
             </div>
           </div>
 
           <div className="hero-aside">
             <p className="hero-body">
-              CS graduate student at the University of Florida building systems that matter.
-              From NASA eye-tracking interfaces and LLM research to algorithmic investment
-              infrastructure and full-stack web platforms.
+              CS graduate student at the University of Florida building software that
+              moves operations. From forecasting and fulfillment systems at The Feed,
+              to risk infrastructure for an algorithmic investment fund, to NASA
+              eye-tracking research and LLM pipelines — I write code where the
+              metric is real-world throughput.
             </p>
             <div className="hero-links">
-              <a href="#projects" className="btn btn-primary">View Projects</a>
+              <a href="#projects" className="btn btn-primary">View Operations Work</a>
               <a href="https://linkedin.com/in/christopherjbowers" className="btn btn-outline" target="_blank">LinkedIn ↗</a>
               <a href="https://github.com/CBowers28" className="btn btn-outline" target="_blank">GitHub ↗</a>
             </div>
           </div>
         </section>
 
+        {/* IMPACT STRIP */}
+        <section id="impact" style={{ padding: "3rem 3rem 1rem" }}>
+          <div className="section-label">By the Numbers</div>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "1.5rem",
+            marginTop: "1rem",
+          }}>
+            {[
+              { stat: "+100%", label: "Warehouse capacity expansion", sub: "The Feed · 2026" },
+              { stat: "30%", label: "Faster order fulfillment", sub: "The Feed · 2026" },
+              { stat: "$750M+", label: "Client portfolio supported", sub: "Morgan Stanley · 2024" },
+              { stat: "200%+", label: "Outreach efficiency gain", sub: "Morgan Stanley · 2024" },
+            ].map((tile) => (
+                <div key={tile.label} style={{
+                  background: "#fff",
+                  border: "1.5px solid rgba(26,26,24,0.08)",
+                  padding: "1.6rem 1.4rem",
+                  boxShadow: "2px 2px 0 rgba(0,0,0,0.06)",
+                }}>
+                  <div style={{
+                    fontFamily: "'Bebas Neue', sans-serif",
+                    fontSize: "2.6rem",
+                    letterSpacing: "0.02em",
+                    lineHeight: 1,
+                    color: "#2A6E3F",
+                  }}>{tile.stat}</div>
+                  <div style={{
+                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.02em",
+                    textTransform: "uppercase",
+                    marginTop: "0.6rem",
+                    color: "var(--ink)",
+                  }}>{tile.label}</div>
+                  <div style={{
+                    fontFamily: "'Space Mono', monospace",
+                    fontSize: "0.6rem",
+                    letterSpacing: "0.08em",
+                    color: "var(--subtle)",
+                    marginTop: "0.35rem",
+                  }}>{tile.sub}</div>
+                </div>
+            ))}
+          </div>
+        </section>
+
         {/* PROJECTS */}
         <section id="projects" style={{ background: "rgba(0,0,0,0.02)" }}>
           <div className="section-label">The Collection</div>
-          <div className="section-title">2026 COLORS</div>
+          <div className="section-title">OPERATIONS · RESEARCH · SYSTEMS</div>
+          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "2rem" }}>
+            {(["All", "Operations", "Project", "Research", "Publication"] as const).map((f) => {
+              const active = projectFilter === f;
+              return (
+                  <button
+                      key={f}
+                      onClick={() => setProjectFilter(f)}
+                      style={{
+                        fontFamily: "'Space Mono', monospace",
+                        fontSize: "0.65rem",
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        padding: "0.55rem 1.1rem",
+                        cursor: "pointer",
+                        border: active ? "1.5px solid var(--ink)" : "1.5px solid rgba(26,26,24,0.15)",
+                        background: active ? "var(--ink)" : "transparent",
+                        color: active ? "var(--bg)" : "var(--ink)",
+                        transition: "all 0.15s",
+                      }}
+                  >
+                    {f}
+                  </button>
+              );
+            })}
+          </div>
           <div className="swatches-grid">
-            {PROJECTS.filter((p) => p.tag === "Research" || p.tag === "Publication" || p.showInGrid).map((p) => (
+            {visibleProjects.map((p) => (
                 <Link key={p.name} href={`/projects/${p.slug}`} className="swatch">
                   <div className="swatch-color" style={{ background: p.color.hex }}>
                 <span style={{
@@ -1125,7 +1218,7 @@ export default function Home() {
                       <div className="edu-card-header">
                         <div>
                           <div className="edu-card-degree">B.S. Computer Science</div>
-                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2023–2025</div>
+                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2022–May 2026</div>
                           <div className="edu-card-school" style={{ marginTop: 4 }}>Certificate: AI Fundamentals &amp; Applications · President&apos;s Honor Roll</div>
                         </div>
                         <div style={{ textAlign: "right" }}>
@@ -1172,7 +1265,7 @@ export default function Home() {
                       <div className="edu-card-header">
                         <div>
                           <div className="edu-card-degree">M.S. Computer Science</div>
-                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2025–Present</div>
+                          <div className="edu-card-school">University of Florida · Herbert Wertheim College of Engineering · 2025–May 2027</div>
                         </div>
                         <div style={{ textAlign: "right" }}>
                           <div className="edu-card-gpa" style={{ color: "#2A9D8F" }}>4.0</div>

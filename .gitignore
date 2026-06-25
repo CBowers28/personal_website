@@ -10,3 +10,6 @@ yarn-error.log*
 .env.local
 
 .vscode/*
+# Local-only Claude Code artifacts
+.backups/
+.claude/

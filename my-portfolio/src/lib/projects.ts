@@ -1,7 +1,7 @@
 export type Project = {
     slug: string;
     name: string;
-    tag: "Research" | "Publication" | "Project";
+    tag: "Research" | "Publication" | "Project" | "Operations";
     color: { hex: string; code: string; name: string };
     desc: string;
     github: string;
@@ -33,6 +33,69 @@ const PANTONE = [
 ];
 
 export const PROJECTS: Project[] = [
+    {
+        slug: "feed-metrics-reporting",
+        showGithub: false,
+        showInGrid: true,
+        name: "Business Metrics Reporting System",
+        tag: "Operations",
+        color: { hex: "#2A6E3F", code: "18-6320 TCX", name: "Jolly Green" },
+        desc: "Company-wide ops reporting that powered The Feed's East Coast expansion",
+        github: "",
+        period: "May 2026 – Aug 2026",
+        org: "The Feed",
+        fullDescription:
+            "Designed and shipped a company-wide business metrics reporting system at The Feed (a high-growth performance nutrition / DTC fulfillment company) that gave leadership the operational visibility required to scale fulfillment into new East Coast regions. The system standardized previously fragmented KPIs across fulfillment, inventory, and demand into a single source of truth.",
+        highlights: [
+            "Standardized cross-functional KPIs (order throughput, fill rate, regional demand, inventory turnover) into a unified reporting layer built on Python and SQL",
+            "Built leadership-facing dashboards that informed the go/no-go for East Coast warehouse expansion",
+            "Partnered with operations, fulfillment, and engineering to align metric definitions across teams previously using ad-hoc spreadsheets",
+            "Reporting layer is now the canonical operational data source used in weekly leadership reviews",
+        ],
+        tech: ["Python", "SQL", "PostgreSQL", "Ruby on Rails", "Pandas"],
+    },
+    {
+        slug: "feed-warehouse-expansion",
+        showGithub: false,
+        showInGrid: true,
+        name: "Warehouse Capacity Expansion",
+        tag: "Operations",
+        color: { hex: "#B85C2A", code: "17-1342 TCX", name: "Pumpkin Spice" },
+        desc: "+100% warehouse capacity, 30% faster fulfillment via systems & CAD planning",
+        github: "",
+        period: "May 2026 – Aug 2026",
+        org: "The Feed",
+        fullDescription:
+            "Contributed to a cross-functional warehouse capacity expansion at The Feed that doubled physical fulfillment capacity (+100%) and reduced order fulfillment times by 30%. Work spanned CAD-based layout planning, automation integration (Brightpick, CMC), and software changes to the fulfillment stack to take advantage of the new capacity.",
+        highlights: [
+            "Supported a +100% expansion in warehouse fulfillment capacity, enabling regional growth without sacrificing SLA",
+            "Reduced average order fulfillment time by 30% through workflow re-design and software changes downstream of new automation hardware",
+            "Coordinated with operations engineers on CAD layouts and integration with Brightpick robotics and CMC packaging automation",
+            "Validated throughput gains against the new metrics reporting system to confirm sustained post-launch performance",
+        ],
+        tech: ["CAD", "Brightpick", "CMC", "Python", "SQL", "Ruby on Rails"],
+    },
+    {
+        slug: "feed-ai-forecasting",
+        showGithub: false,
+        showInGrid: true,
+        name: "AI Demand & Inventory Forecasting",
+        tag: "Operations",
+        color: { hex: "#1A6B7A", code: "18-4528 TCX", name: "Mosaic Blue" },
+        desc: "Python + SQL forecasting pipeline that cut inventory discrepancies",
+        github: "",
+        period: "May 2026 – Aug 2026",
+        org: "The Feed",
+        fullDescription:
+            "Led the deployment of an AI-driven forecasting pipeline at The Feed that predicts stock and demand levels across SKUs, reducing inventory discrepancies and improving purchasing decisions. The pipeline ingests historical order data, current on-hand inventory, and regional demand signals to produce actionable forecasts consumed by the operations and purchasing teams.",
+        highlights: [
+            "Productionized a Python + SQL forecasting pipeline predicting demand and stock levels across the full SKU catalog",
+            "Reduced inventory discrepancies by surfacing forecast vs actual deltas directly inside the new metrics reporting layer",
+            "Integrated forecasts into purchasing workflows so reorder decisions reflect projected demand rather than trailing averages",
+            "Coordinated with data, ops, and engineering to define accuracy targets and monitoring on forecast drift",
+        ],
+        tech: ["Python", "SQL", "Pandas", "Scikit-Learn", "PostgreSQL"],
+    },
     {
         slug: "nasa-eye-tracking",
         name: "NASA Eye-Tracking",
@@ -100,7 +163,7 @@ export const PROJECTS: Project[] = [
         showGithub: false,
         showInGrid: true,
         name: "AlgoGators Risk Framework",
-        tag: "Project",
+        tag: "Operations",
         color: PANTONE[1],
         desc: "Stop-loss thresholds & performance alerts with pandas & NumPy",
         github: "",
@@ -161,7 +224,7 @@ export const PROJECTS: Project[] = [
         slug: "morgan-stanley-automation",
         showGithub: false,
         name: "Morgan Stanley Automation",
-        tag: "Project",
+        tag: "Operations",
         color: PANTONE[4],
         desc: "Client outreach automation — 200%+ efficiency gain on $750M+ portfolio",
         github: "",
@@ -182,7 +245,7 @@ export const PROJECTS: Project[] = [
         showGithub: false,
         showInGrid: true,
         name: "Client Review System",
-        tag: "Project",
+        tag: "Operations",
         color: { hex: "#D2362B", code: "18-1662 TCX", name: "Flame Scarlet" },
         desc: "C++ system for processing quarterly & annual client performance reviews at Morgan Stanley",
         github: "",
@@ -300,6 +363,24 @@ export type Experience = {
 };
 
 export const EXPERIENCE: Experience[] = [
+    {
+        slug: "the-feed",
+        company: "The Feed",
+        role: "Software Engineering Intern",
+        period: "May 2026 – Aug 2026",
+        location: "Boulder, CO",
+        color: { hex: "#2A6E3F", code: "18-6320 TCX", name: "Jolly Green" },
+        summary:
+            "Built operational software at The Feed — a high-growth performance nutrition fulfillment company — focused on giving leadership the metrics, forecasting, and capacity to scale fulfillment into new East Coast regions.",
+        bullets: [
+            "Created and standardized a company-wide business metrics reporting system that enabled a smoother East Coast expansion, giving leadership the operational visibility to scale fulfillment into new regions",
+            "Assisted in expanding warehouse capacity by +100%, improving overall fulfillment throughput and reducing order fulfillment times by 30%",
+            "Led deployment of an AI forecasting pipeline using Python and SQL to predict stock and demand levels, reducing inventory discrepancies",
+            "Worked across software, operations, and warehouse engineering — bridging Python/SQL/Rails systems with Brightpick and CMC automation",
+        ],
+        tech: ["Python", "Ruby on Rails", "SQL", "PostgreSQL", "CAD", "Brightpick", "CMC"],
+        relatedProjects: ["feed-metrics-reporting", "feed-warehouse-expansion", "feed-ai-forecasting"],
+    },
     {
         slug: "morgan-stanley",
         company: "Morgan Stanley",
