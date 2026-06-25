@@ -1008,7 +1008,6 @@ export default function Home() {
               { stat: "+100%", label: "Warehouse capacity expansion", sub: "The Feed · 2026" },
               { stat: "30%", label: "Faster order fulfillment", sub: "The Feed · 2026" },
               { stat: "$750M+", label: "Client portfolio supported", sub: "Morgan Stanley · 2024" },
-              { stat: "200%+", label: "Outreach efficiency gain", sub: "Morgan Stanley · 2024" },
             ].map((tile) => (
                 <div key={tile.label} style={{
                   background: "#fff",
