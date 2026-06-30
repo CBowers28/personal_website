@@ -97,15 +97,6 @@ const TRACKS = [
     link: "/experience/ruiz-hci-lab",
   },
   {
-    label: "Publisher Agency",
-    sub: "Developer Intern · AWS Migration",
-    start: toMonth(2025, 4),
-    end:   toMonth(2025, 7),
-    color: "#6B5070",
-    ongoing: false,
-    link: "/experience/publisher-agency",
-  },
-  {
     label: "Digital Markets Initiative",
     sub: "Undergraduate Researcher · LLM",
     start: toMonth(2025, 11),
@@ -970,6 +961,7 @@ export default function Home() {
 
         /* Default: desktop map shown, mobile map hidden */
         .timeline-mobile { display: none; }
+        .key-title-mobile { display: none; }
         .mobile-window-note {
           display: flex;
           justify-content: space-between;
@@ -1049,9 +1041,11 @@ export default function Home() {
           /* PROJECTS GRID + FILTER CHIPS */
           .swatches-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 
-          /* TRANSIT MAP — swap to condensed mobile version */
+          /* TRANSIT MAP — hidden on mobile entirely; legend list only */
           .timeline-desktop { display: none; }
-          .timeline-mobile  { display: block; }
+          .timeline-mobile  { display: none; }
+          .key-title-desktop { display: none; }
+          .key-title-mobile  { display: block; }
           .axis-year-label { font-size: 0.6rem; }
           .key-grid { grid-template-columns: 1fr; gap: 0.4rem; }
           .key-name { font-size: 0.78rem; white-space: normal; }
@@ -1362,7 +1356,8 @@ export default function Home() {
 
             {/* Legend grid */}
             <div className="color-key">
-              <div className="key-title">Legend</div>
+              <div className="key-title key-title-desktop">Legend</div>
+              <div className="key-title key-title-mobile">Experience</div>
               <div className="key-grid">
                 {TRACKS.map((track) => {
                   const isEdu = track.label === "B.S. Computer Science" || track.label === "M.S. Computer Science";

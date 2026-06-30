@@ -200,27 +200,6 @@ export const PROJECTS: Project[] = [
         tech: ["Python", "Scikit-Learn", "NumPy", "TensorFlow", "Keras", "Pandas", "HiPerGator"],
     },
     {
-        slug: "aws-web-migration",
-        showGithub: false,
-        showInGrid: true,
-        name: "AWS Web Migration",
-        tag: "Project",
-        color: PANTONE[6],
-        desc: "Cross-platform full-stack migration to AWS at Publisher Agency",
-        github: "",
-        period: "May 2025 – Aug 2025",
-        org: "Publisher Agency",
-        fullDescription:
-            "Led a cross-platform web migration to AWS infrastructure at Publisher Agency, rebuilding the existing system as a scalable full-stack application. The migration improved performance, reliability, and cost efficiency while modernizing the tech stack.",
-        highlights: [
-            "Architected and executed a full migration to AWS infrastructure including S3 and EC2",
-            "Built full-stack solutions using Python, React, and TypeScript that improved performance and scalability",
-            "Coordinated cross-platform compatibility across web and mobile targets",
-            "Delivered production deployment within a 3-month internship timeline",
-        ],
-        tech: ["Python", "React", "TypeScript", "AWS S3", "AWS EC2", "Docker"],
-    },
-    {
         slug: "morgan-stanley-automation",
         showGithub: false,
         name: "Morgan Stanley Automation",
@@ -398,24 +377,6 @@ export const EXPERIENCE: Experience[] = [
         ],
         tech: ["Python", "C++", "Excel", "LaTeX", "Proprietary Internal Tools"],
         relatedProjects: ["morgan-stanley-automation", "client-review-system"],
-    },
-    {
-        slug: "publisher-agency",
-        company: "Publisher Agency",
-        role: "Developer Intern",
-        period: "May 2025 – Aug 2025",
-        location: "Remote",
-        color: { hex: "#6B5070", code: "18-3513 TCX", name: "Grape Compote" },
-        summary:
-            "Led a cross-platform web migration to AWS infrastructure, rebuilding the existing system as a scalable full-stack application using modern cloud technologies.",
-        bullets: [
-            "Architected and executed a full migration to AWS infrastructure including S3 and EC2",
-            "Built full-stack solutions with Python, React, and TypeScript that improved performance and scalability",
-            "Coordinated cross-platform compatibility across web and mobile targets",
-            "Delivered production deployment within a 3-month internship timeline",
-        ],
-        tech: ["Python", "React", "TypeScript", "AWS S3", "AWS EC2", "Docker"],
-        relatedProjects: ["aws-web-migration"],
     },
     {
         slug: "algogators",
