@@ -940,19 +940,93 @@ export default function Home() {
 
         @media (max-width: 1024px) {
           .swatches-grid { grid-template-columns: repeat(2, 1fr); }
+          .key-grid     { grid-template-columns: repeat(2, 1fr); }
         }
+
+        /* ─── TABLET / LARGE PHONE ─── */
         @media (max-width: 768px) {
-          .hero { flex-direction: column; padding-top: 6rem; }
-          .hero-aside { padding-left: 0; padding-top: 2.5rem; max-width: 100%; }
+          /* NAV — stack logo above links, both centered */
+          nav {
+            padding: 0.9rem 1.25rem;
+            flex-direction: column;
+            gap: 0.55rem;
+          }
+          .nav-logo { font-size: 1.05rem; letter-spacing: 0.18em; }
+          .nav-links { gap: 1.25rem; flex-wrap: wrap; justify-content: center; }
+          .nav-links a { font-size: 0.65rem; }
+          html { scroll-padding-top: 110px; }
+
+          /* HERO — fully stacked + centered */
+          .hero {
+            flex-direction: column;
+            padding: 7rem 1.25rem 3rem;
+            justify-content: flex-start;
+            align-items: center;
+            text-align: center;
+          }
+          .hero-chip { width: 100%; max-width: 420px; margin: 0 auto; }
+          .chip-color { height: 240px; }
+          .chip-name { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+          .hero-aside {
+            padding-left: 0;
+            padding-top: 2rem;
+            max-width: 100%;
+            text-align: center;
+          }
+          .hero-tagline { font-size: 2.4rem; }
+          .hero-body { font-size: 1rem; line-height: 1.6; }
+          .hero-links {
+            justify-content: center;
+          }
+
+          /* SECTION SPACING */
+          section { padding: 3.5rem 1.25rem; }
+          .section-title { font-size: clamp(1.75rem, 7vw, 2.5rem); margin-bottom: 2rem; }
+
+          /* IMPACT TILES — already auto-fit, just shrink the big number */
+          #impact { padding: 2rem 1.25rem 0.5rem !important; }
+
+          /* PROJECTS GRID + FILTER CHIPS */
+          .swatches-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+          /* TRANSIT MAP — give year labels more room, stack legend */
+          .axis-year-label { font-size: 0.55rem; }
+          .key-grid { grid-template-columns: 1fr; gap: 0.4rem; }
+          .key-name { font-size: 0.78rem; white-space: normal; }
+          .key-text { padding: 0.9rem 1rem; }
+          .key-sub  { font-size: 0.58rem; }
+
+          /* CONTACT */
           .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
           .color-preview { position: static; }
-          nav { padding: 1rem 1.5rem; }
-          .nav-links { gap: 1.5rem; }
-          section { padding: 4rem 1.5rem; }
-          .swatches-grid { grid-template-columns: repeat(2, 1fr); }
+
+          /* FOOTER — stack stacked */
+          footer {
+            flex-direction: column;
+            gap: 0.9rem;
+            padding: 1.75rem 1.25rem;
+            text-align: center;
+          }
+          footer > div { flex-wrap: wrap; justify-content: center; gap: 0.85rem !important; }
+
+          /* EDU MODAL */
+          .edu-modal-backdrop { padding: 1rem; }
+          .edu-card-header { padding: 1.1rem 3rem 1rem 1.1rem; }
+          .edu-card-body   { padding: 1rem 1.1rem 1.2rem; }
+          .edu-card-gpa    { font-size: 1.6rem; }
+          .edu-card-degree { font-size: 0.8rem; }
         }
+
+        /* ─── SMALL PHONE ─── */
         @media (max-width: 480px) {
           .swatches-grid { grid-template-columns: 1fr; }
+          .hero-tagline  { font-size: 2rem; }
+          .chip-color    { height: 200px; }
+          .chip-name     { font-size: clamp(1.6rem, 9vw, 2.2rem); }
+          .nav-logo      { font-size: 0.95rem; letter-spacing: 0.14em; }
+          .nav-links     { gap: 1rem; }
+          .nav-links a   { font-size: 0.6rem; letter-spacing: 0.08em; }
+          .hero-links .btn { flex: 1 1 auto; text-align: center; }
         }
       `}</style>
 
