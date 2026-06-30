@@ -44,6 +44,12 @@ const PANTONE_COLORS = [
 const TOTAL_MONTHS = 66;
 const toMonth = (year: number, month: number) => (year - 2022) * 12 + month; // month 0=Jan
 
+// Current month-offset against the 2022 baseline — used to pin ongoing-track end dots to today
+const _now = new Date();
+const NOW_MONTH = Math.min(TOTAL_MONTHS, Math.max(0, toMonth(_now.getFullYear(), _now.getMonth())));
+const trackEnd = (t: { start: number; end: number; ongoing: boolean }) =>
+    t.ongoing ? Math.max(t.start + 0.5, NOW_MONTH) : t.end;
+
 const TRACKS = [
   {
     label: "B.S. Computer Science",
@@ -51,7 +57,7 @@ const TRACKS = [
     start: toMonth(2022, 7),
     end:   toMonth(2026, 4),
     color: "#1B3F6B",
-    ongoing: true,
+    ongoing: false,
     link: "https://www.cise.ufl.edu",
   },
   {
@@ -110,11 +116,11 @@ const TRACKS = [
   },
   {
     label: "The Feed",
-    sub: "SWE Intern · Ops, Forecasting & Fulfillment",
+    sub: "SWE · Ops, Forecasting & Fulfillment",
     start: toMonth(2026, 4),
     end:   toMonth(2026, 7),
     color: "#2A6E3F",
-    ongoing: false,
+    ongoing: true,
     link: "/experience/the-feed",
   },
 ];
@@ -1245,8 +1251,9 @@ export default function Home() {
               <div className="tracks-area" style={{ height: TRACKS.length * 36 + 20, position: "relative" }}>
                 {TRACKS.map((track, i) => {
                   const MAP_W_PCT = 100;
+                  const endM = trackEnd(track);
                   const leftPct  = (track.start / TOTAL_MONTHS) * MAP_W_PCT;
-                  const widthPct = ((track.end - track.start) / TOTAL_MONTHS) * MAP_W_PCT;
+                  const widthPct = ((endM - track.start) / TOTAL_MONTHS) * MAP_W_PCT;
                   const topPx    = 10 + i * 36;
                   return (
                       <div key={track.label}>
@@ -1295,14 +1302,15 @@ export default function Home() {
               {(() => {
                 const visible = TRACKS
                     .map((t) => {
+                      const realEnd = trackEnd(t);
                       const vStart = Math.max(t.start, MOBILE_START);
-                      const vEnd   = Math.min(t.end, MOBILE_END);
+                      const vEnd   = Math.min(realEnd, MOBILE_END);
                       if (vEnd <= MOBILE_START || vStart >= MOBILE_END) return null;
                       return {
                         ...t,
                         vStart, vEnd,
                         clipL: t.start < MOBILE_START,
-                        clipR: t.end > MOBILE_END,
+                        clipR: realEnd > MOBILE_END,
                       };
                     })
                     .filter((t): t is NonNullable<typeof t> => t !== null);

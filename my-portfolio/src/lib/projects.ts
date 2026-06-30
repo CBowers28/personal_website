@@ -42,7 +42,7 @@ export const PROJECTS: Project[] = [
         color: { hex: "#2A6E3F", code: "18-6320 TCX", name: "Jolly Green" },
         desc: "Company-wide ops reporting that powered The Feed's East Coast expansion",
         github: "",
-        period: "May 2026 – Aug 2026",
+        period: "May 2026 – Present",
         org: "The Feed",
         fullDescription:
             "Designed and shipped a company-wide business metrics reporting system at The Feed (a high-growth performance nutrition / DTC fulfillment company) that gave leadership the operational visibility required to scale fulfillment into new East Coast regions. The system standardized previously fragmented KPIs across fulfillment, inventory, and demand into a single source of truth.",
@@ -63,7 +63,7 @@ export const PROJECTS: Project[] = [
         color: { hex: "#B85C2A", code: "17-1342 TCX", name: "Pumpkin Spice" },
         desc: "+100% warehouse capacity, 30% faster fulfillment via systems & CAD planning",
         github: "",
-        period: "May 2026 – Aug 2026",
+        period: "May 2026 – Present",
         org: "The Feed",
         fullDescription:
             "Contributed to a cross-functional warehouse capacity expansion at The Feed that doubled physical fulfillment capacity (+100%) and reduced order fulfillment times by 30%. Work spanned CAD-based layout planning, automation integration (Brightpick, CMC), and software changes to the fulfillment stack to take advantage of the new capacity.",
@@ -84,7 +84,7 @@ export const PROJECTS: Project[] = [
         color: { hex: "#1A6B7A", code: "18-4528 TCX", name: "Mosaic Blue" },
         desc: "Python + SQL forecasting pipeline that cut inventory discrepancies",
         github: "",
-        period: "May 2026 – Aug 2026",
+        period: "May 2026 – Present",
         org: "The Feed",
         fullDescription:
             "Led the deployment of an AI-driven forecasting pipeline at The Feed that predicts stock and demand levels across SKUs, reducing inventory discrepancies and improving purchasing decisions. The pipeline ingests historical order data, current on-hand inventory, and regional demand signals to produce actionable forecasts consumed by the operations and purchasing teams.",
@@ -367,7 +367,7 @@ export const EXPERIENCE: Experience[] = [
         slug: "the-feed",
         company: "The Feed",
         role: "Software Engineering Intern",
-        period: "May 2026 – Aug 2026",
+        period: "May 2026 – Present",
         location: "Boulder, CO",
         color: { hex: "#2A6E3F", code: "18-6320 TCX", name: "Jolly Green" },
         summary:
