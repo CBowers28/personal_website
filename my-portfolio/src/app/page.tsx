@@ -1045,7 +1045,7 @@ export default function Home() {
           .timeline-desktop { display: none; }
           .timeline-mobile  { display: none; }
           .key-title-desktop { display: none; }
-          .key-title-mobile  { display: block; }
+          .key-title-mobile  { display: none; }
           .axis-year-label { font-size: 0.6rem; }
           .key-grid { grid-template-columns: 1fr; gap: 0.4rem; }
           .key-name { font-size: 0.78rem; white-space: normal; }
