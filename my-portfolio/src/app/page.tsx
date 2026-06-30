@@ -121,6 +121,28 @@ const TRACKS = [
 
 const YEAR_MARKS = [2022, 2023, 2024, 2025, 2026, 2027];
 
+// Mobile-only condensed window (24 months centered on current work)
+const MOBILE_START = toMonth(2025, 4);   // May 2025
+const MOBILE_END   = toMonth(2027, 4);   // May 2027
+const MOBILE_MONTHS = MOBILE_END - MOBILE_START;
+const MOBILE_YEAR_MARKS = [2025, 2026, 2027];
+
+// Inline-SVG arrows (replace emoji ↗ / →)
+const ArrowRight = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="5" y1="12" x2="19" y2="12" />
+      <polyline points="13 6 19 12 13 18" />
+    </svg>
+);
+const ArrowUpRight = () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="9 7 17 7 17 15" />
+    </svg>
+);
+
 export default function Home() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
@@ -635,12 +657,14 @@ export default function Home() {
         }
 
         .key-arrow {
-          font-size: 0.85rem;
           color: var(--subtle);
-          padding: 0.65rem 0.65rem 0.65rem 0;
+          padding: 0.65rem 0.85rem 0.65rem 0;
           align-self: center;
+          display: inline-flex;
+          align-items: center;
           transition: transform 0.2s, color 0.2s;
         }
+        .key-arrow svg { display: block; }
 
         .key-item:hover .key-arrow { transform: translateX(3px); color: var(--ink); }
 
@@ -938,6 +962,36 @@ export default function Home() {
           font-style: italic;
         }
 
+        /* Default: desktop map shown, mobile map hidden */
+        .timeline-mobile { display: none; }
+        .mobile-window-note {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 0.75rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          color: var(--ink);
+          text-transform: uppercase;
+        }
+        .mobile-window-hint {
+          color: var(--subtle);
+          font-size: 0.55rem;
+          letter-spacing: 0.06em;
+          text-transform: none;
+          font-style: italic;
+        }
+        .mobile-track-label {
+          position: absolute;
+          left: 0;
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.65rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
         @media (max-width: 1024px) {
           .swatches-grid { grid-template-columns: repeat(2, 1fr); }
           .key-grid     { grid-template-columns: repeat(2, 1fr); }
@@ -989,8 +1043,10 @@ export default function Home() {
           /* PROJECTS GRID + FILTER CHIPS */
           .swatches-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 
-          /* TRANSIT MAP — give year labels more room, stack legend */
-          .axis-year-label { font-size: 0.55rem; }
+          /* TRANSIT MAP — swap to condensed mobile version */
+          .timeline-desktop { display: none; }
+          .timeline-mobile  { display: block; }
+          .axis-year-label { font-size: 0.6rem; }
           .key-grid { grid-template-columns: 1fr; gap: 0.4rem; }
           .key-name { font-size: 0.78rem; white-space: normal; }
           .key-text { padding: 0.9rem 1rem; }
@@ -1176,8 +1232,8 @@ export default function Home() {
           <div className="section-title">EDUCATION &amp; EXPERIENCE</div>
           <div className="transit-wrapper">
 
-            {/* Horizontal Map */}
-            <div className="transit-map">
+            {/* Horizontal Map — DESKTOP (full 2022–2027 window) */}
+            <div className="transit-map timeline-desktop">
               {/* X axis — year labels */}
               <div className="transit-x-axis">
                 {YEAR_MARKS.map((yr) => (
@@ -1225,6 +1281,77 @@ export default function Home() {
               </div>
             </div>
 
+            {/* Horizontal Map — MOBILE (condensed 24-month window) */}
+            <div className="transit-map timeline-mobile">
+              <div className="mobile-window-note">
+                <span>Recent · {MOBILE_YEAR_MARKS[0]}–{MOBILE_YEAR_MARKS[MOBILE_YEAR_MARKS.length - 1]}</span>
+                <span className="mobile-window-hint">Older roles in legend below</span>
+              </div>
+              <div className="transit-x-axis">
+                {MOBILE_YEAR_MARKS.map((yr) => (
+                    <span key={yr} className="axis-year-label">{yr}</span>
+                ))}
+              </div>
+              {(() => {
+                const visible = TRACKS
+                    .map((t) => {
+                      const vStart = Math.max(t.start, MOBILE_START);
+                      const vEnd   = Math.min(t.end, MOBILE_END);
+                      if (vEnd <= MOBILE_START || vStart >= MOBILE_END) return null;
+                      return {
+                        ...t,
+                        vStart, vEnd,
+                        clipL: t.start < MOBILE_START,
+                        clipR: t.end > MOBILE_END,
+                      };
+                    })
+                    .filter((t): t is NonNullable<typeof t> => t !== null);
+                return (
+                    <div className="tracks-area" style={{ height: visible.length * 44 + 12, position: "relative" }}>
+                      {visible.map((t, i) => {
+                        const leftPct  = ((t.vStart - MOBILE_START) / MOBILE_MONTHS) * 100;
+                        const widthPct = ((t.vEnd - t.vStart) / MOBILE_MONTHS) * 100;
+                        const topPx    = 6 + i * 44;
+                        return (
+                            <div key={t.label}>
+                              <div
+                                  className="track-row mobile-track-row"
+                                  style={{
+                                    left: `${leftPct}%`,
+                                    width: `${widthPct}%`,
+                                    top: topPx,
+                                    background: t.color,
+                                    borderTopLeftRadius:    t.clipL ? 0 : 5,
+                                    borderBottomLeftRadius: t.clipL ? 0 : 5,
+                                    borderTopRightRadius:    t.clipR ? 0 : 5,
+                                    borderBottomRightRadius: t.clipR ? 0 : 5,
+                                  }}
+                              />
+                              {!t.clipL && (
+                                  <div className="track-dot-h track-dot-h-start"
+                                       style={{ left: `${leftPct}%`, top: topPx + 7, color: t.color, borderColor: t.color }} />
+                              )}
+                              {!t.clipR && (
+                                  <div className={`track-dot-h ${t.ongoing ? "track-dot-h-ongoing" : "track-dot-h-end"}`}
+                                       style={{
+                                         left: `${leftPct + widthPct}%`,
+                                         top: topPx + 7,
+                                         color: t.color,
+                                         borderColor: t.color,
+                                         background: t.ongoing ? "var(--bg)" : t.color,
+                                       }} />
+                              )}
+                              <div className="mobile-track-label" style={{ top: topPx + 18, color: t.color }}>
+                                {t.label}
+                              </div>
+                            </div>
+                        );
+                      })}
+                    </div>
+                );
+              })()}
+            </div>
+
             {/* Legend grid */}
             <div className="color-key">
               <div className="key-title">Legend</div>
@@ -1242,7 +1369,7 @@ export default function Home() {
                             <div className="key-name">{track.label}</div>
                             <div className="key-sub">{track.sub}</div>
                           </div>
-                          <span className="key-arrow">↗</span>
+                          <span className="key-arrow"><ArrowUpRight /></span>
                         </button>
                     );
                   }
@@ -1256,7 +1383,7 @@ export default function Home() {
                           <div className="key-name">{track.label}</div>
                           <div className="key-sub">{track.sub}</div>
                         </div>
-                        <span className="key-arrow">→</span>
+                        <span className="key-arrow"><ArrowRight /></span>
                       </Link>
                   );
                 })}
