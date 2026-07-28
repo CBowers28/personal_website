@@ -17,7 +17,7 @@ export default function ExperiencePage({ params }: { params: Promise<{ slug: str
             <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
 
-        :root { --bg: #F2EFE4; --ink: #1A1A18; --subtle: #9A9088; }
+        :root { --bg: #F8F6F0; --ink: #1A1A18; --subtle: #9A9088; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
 
@@ -25,7 +25,7 @@ export default function ExperiencePage({ params }: { params: Promise<{ slug: str
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
           padding: 1.25rem 3rem;
           display: flex; align-items: center; justify-content: space-between;
-          background: rgba(242,239,228,0.9); backdrop-filter: blur(10px);
+          background: rgba(248,246,240,0.9); backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(26,26,24,0.08);
         }
         .back-link {

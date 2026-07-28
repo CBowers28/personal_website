@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { PROJECTS } from "@/lib/projects";
+import { PROJECTS, COLLECTIONS } from "@/lib/projects";
+import { PUBLISHED_POSTS, formatPostDate } from "@/lib/posts";
 
 // ─── Pantone Palette ────────────────────────────────────────────────
-// Hero cycling colors — vivid & bright
+// Hero cycling colors, vivid & bright
 const HERO_COLORS = [
   { hex: "#E8192C", code: "18-1663 TCX", name: "Racing Red" },
   { hex: "#0047AB", code: "19-4150 TCX", name: "Royal Blue" },
@@ -21,108 +22,73 @@ const HERO_COLORS = [
   { hex: "#1E3A8A", code: "19-4340 TCX", name: "Cobalt" },
 ];
 
-// PANTONE_COLORS still used for contact picker + transit map
-const PANTONE_COLORS = [
-  { hex: "#D2362B", code: "18-1662 TCX", name: "Flame Scarlet" },
-  { hex: "#E8A820", code: "14-1064 TCX", name: "Saffron" },
-  { hex: "#1B3F6B", code: "19-4052 TCX", name: "Classic Blue" },
-  { hex: "#2A9D8F", code: "15-5718 TCX", name: "Biscay Green" },
-  { hex: "#4A5240", code: "19-0323 TCX", name: "Chive" },
-  { hex: "#7B9EB5", code: "17-4021 TCX", name: "Faded Denim" },
-  { hex: "#E07B39", code: "16-1359 TCX", name: "Orange Peel" },
-  { hex: "#1A6B7A", code: "18-4528 TCX", name: "Mosaic Blue" },
-  { hex: "#E8D8A0", code: "13-0822 TCX", name: "Sunlight" },
-  { hex: "#E8A898", code: "14-1318 TCX", name: "Coral Pink" },
-  { hex: "#8B4A2A", code: "18-1345 TCX", name: "Cinnamon Stick" },
-  { hex: "#6B5070", code: "18-3513 TCX", name: "Grape Compote" },
-];
 
+// ─── Colors Over Time ───────────────────────────────────────────────
+// A chromatic timeline: each era is a phase of interest with its own Pantone
+// color, and the major milestone projects from that phase are pinned to it.
+// The spine changes color era-to-era, a palette that evolves as focus shifts.
+type Era = {
+  years: string;
+  focus: string;
+  interest: string;
+  color: { hex: string; code: string; name: string };
+  roles: { label: string; link: string }[];
+  milestones: string[]; // project slugs, resolved against PROJECTS
+  ongoing?: boolean;
+};
 
-// ─── Timeline ───────────────────────────────────────────────────────
-// Transit map timeline
-// Time axis: Jan 2022 (0) → Jun 2027 (66 months)
-const TOTAL_MONTHS = 66;
-const toMonth = (year: number, month: number) => (year - 2022) * 12 + month; // month 0=Jan
-
-// Current month-offset against the 2022 baseline — used to pin ongoing-track end dots to today
-const _now = new Date();
-const NOW_MONTH = Math.min(TOTAL_MONTHS, Math.max(0, toMonth(_now.getFullYear(), _now.getMonth())));
-const trackEnd = (t: { start: number; end: number; ongoing: boolean }) =>
-    t.ongoing ? Math.max(t.start + 0.5, NOW_MONTH) : t.end;
-
-const TRACKS = [
+const ERAS: Era[] = [
   {
-    label: "B.S. Computer Science",
-    sub: "University of Florida · 3.93 GPA",
-    start: toMonth(2022, 7),
-    end:   toMonth(2026, 4),
-    color: "#1B3F6B",
-    ongoing: false,
-    link: "https://www.cise.ufl.edu",
+    years: "2022 – 2023",
+    focus: "Foundations",
+    interest: "Mostly just learning to build, the CS fundamentals, and the first programs of mine that actually did something.",
+    color: { hex: "#1B3F6B", code: "19-4052 TCX", name: "Classic Blue" },
+    roles: [],
+    milestones: [],
   },
   {
-    label: "M.S. Computer Science",
-    sub: "University of Florida · 4.0 GPA",
-    start: toMonth(2025, 7),
-    end:   toMonth(2027, 4),
-    color: "#2A9D8F",
+    years: "2024",
+    focus: "Markets & Risk",
+    interest: "I got into finance because decisions driven purely by compute struck me as interesting. In practice that meant risk infrastructure for a student trading fund and tooling for a $750M+ desk.",
+    color: { hex: "#E8A820", code: "14-1064 TCX", name: "Saffron" },
+    roles: [
+      { label: "AlgoGators Fund", link: "/experience/algogators" },
+      { label: "Morgan Stanley", link: "/experience/morgan-stanley" },
+    ],
+    milestones: ["algogators-risk-framework", "morgan-stanley-automation"],
+  },
+  {
+    years: "2024 – 2025",
+    focus: "Research & Perception",
+    interest: "A turn toward how people and computers actually interact, eye-tracking for a NASA fatigue study, and how people share attention in augmented reality.",
+    color: { hex: "#E07B39", code: "16-1359 TCX", name: "Orange Peel" },
+    roles: [{ label: "Ruiz HCI Lab", link: "/experience/ruiz-hci-lab" }],
+    milestones: ["nasa-eye-tracking"],
+  },
+  {
+    years: "2025 – 2026",
+    focus: "Models & Language",
+    interest: "Getting serious about ML, fine-tuning LLMs on HiPerGator and measuring what language models are doing to the economy. Less interested in the buzzwords than in how they actually work.",
+    color: { hex: "#6C4F8C", code: "18-3339 TCX", name: "Amethyst Orchid" },
+    roles: [{ label: "Digital Markets Initiative", link: "/experience/digital-markets-initiative" }],
+    milestones: ["llm-finetuning", "llm-sentiment-analysis"],
+  },
+  {
+    years: "2026 – Present",
+    focus: "Operations",
+    interest: "Software that moves real operations, forecasting, fulfillment, and the recommendation stack scaling The Feed into new regions.",
+    color: { hex: "#2A6E3F", code: "18-6320 TCX", name: "Jolly Green" },
+    roles: [{ label: "The Feed", link: "/experience/the-feed" }],
+    milestones: ["feed-warehouse-expansion", "strava-recommender"],
     ongoing: true,
-    link: "https://www.cise.ufl.edu",
-  },
-  {
-    label: "AlgoGators Investment Fund",
-    sub: "Lead Developer · Risk & Attribution",
-    start: toMonth(2024, 0),
-    end:   toMonth(2024, 9),
-    color: "#E8A820",
-    ongoing: false,
-    link: "/experience/algogators",
-  },
-  {
-    label: "Morgan Stanley",
-    sub: "Software Engineering Intern",
-    start: toMonth(2024, 4),
-    end:   toMonth(2024, 7),
-    color: "#D2362B",
-    ongoing: false,
-    link: "/experience/morgan-stanley",
-  },
-  {
-    label: "Ruiz HCI Lab",
-    sub: "Undergraduate Researcher · NASA",
-    start: toMonth(2024, 9),
-    end:   toMonth(2026, 1),
-    color: "#E07B39",
-    ongoing: true,
-    link: "/experience/ruiz-hci-lab",
-  },
-  {
-    label: "Digital Markets Initiative",
-    sub: "Undergraduate Researcher · LLM",
-    start: toMonth(2025, 11),
-    end:   toMonth(2026, 1),
-    link: "/experience/digital-markets-initiative",
-    color: "#1A6B7A",
-    ongoing: true,
-  },
-  {
-    label: "The Feed",
-    sub: "SWE · Ops, Forecasting & Fulfillment",
-    start: toMonth(2026, 4),
-    end:   toMonth(2026, 7),
-    color: "#2A6E3F",
-    ongoing: true,
-    link: "/experience/the-feed",
   },
 ];
 
-const YEAR_MARKS = [2022, 2023, 2024, 2025, 2026, 2027];
-
-// Mobile-only condensed window (24 months centered on current work)
-const MOBILE_START = toMonth(2025, 4);   // May 2025
-const MOBILE_END   = toMonth(2027, 4);   // May 2027
-const MOBILE_MONTHS = MOBILE_END - MOBILE_START;
-const MOBILE_YEAR_MARKS = [2025, 2026, 2027];
+// Two education tracks kept as clickable chips (open the coursework modals).
+const EDU_TRACKS = [
+  { key: "bs" as const, degree: "B.S. Computer Science", sub: "University of Florida · 2022 – 2026", gpa: "3.93", color: "#1B3F6B" },
+  { key: "ms" as const, degree: "M.S. Computer Science", sub: "University of Florida · 2025 – 2027", gpa: "4.0", color: "#2A9D8F" },
+];
 
 // Inline-SVG arrows (replace emoji ↗ / →)
 const ArrowRight = () => (
@@ -145,14 +111,23 @@ export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [heroColorIdx, setHeroColorIdx] = useState(2);
   const [eduModal, setEduModal] = useState<"bs" | "ms" | null>(null);
-  const [projectFilter, setProjectFilter] = useState<"All" | "Operations" | "Research" | "Publication" | "Project">("All");
+  const [openCollection, setOpenCollection] = useState<string | null>(null);
+  // Anti-spam: honeypot value + the moment the form was rendered (bots submit instantly).
+  const [honeypot, setHoneypot] = useState("");
+  const formRenderedAt = useRef<number | null>(null);
 
-  const TAG_ORDER: Record<string, number> = { Operations: 0, Project: 1, Research: 2, Publication: 3 };
-  const visibleProjects = PROJECTS
-      .filter((p) => p.tag === "Research" || p.tag === "Publication" || p.showInGrid)
-      .filter((p) => projectFilter === "All" ? true : p.tag === projectFilter)
-      .slice()
-      .sort((a, b) => (TAG_ORDER[a.tag] ?? 99) - (TAG_ORDER[b.tag] ?? 99));
+  // Stamp the render time on mount (kept out of render to stay pure).
+  useEffect(() => {
+    formRenderedAt.current = Date.now();
+  }, []);
+
+  // Three vivid "staple" projects, then everything else grouped into
+  // muted themed collections.
+  const heroProjects = PROJECTS.filter((p) => p.hero);
+  const collectionGroups = COLLECTIONS.map((c) => ({
+    ...c,
+    projects: PROJECTS.filter((p) => p.collection === c.slug && !p.hero),
+  })).filter((g) => g.projects.length > 0);
 
   const heroPantone = HERO_COLORS[heroColorIdx];
 
@@ -218,7 +193,7 @@ export default function Home() {
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
 
         :root {
-          --bg: #F2EFE4;
+          --bg: #F8F6F0;
           --ink: #1A1A18;
           --subtle: #9A9088;
         }
@@ -242,7 +217,7 @@ export default function Home() {
           justify-content: space-between;
           align-items: center;
           padding: 1.25rem 3rem;
-          background: rgba(244,240,230,0.85);
+          background: rgba(248,246,240,0.85);
           backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(26,26,24,0.08);
         }
@@ -510,6 +485,653 @@ export default function Home() {
           word-break: break-all;
         }
 
+        /* ── SECTION LEDE ── */
+        .section-lede {
+          font-size: 1.15rem;
+          line-height: 1.6;
+          color: #666;
+          max-width: 560px;
+          margin: -2rem 0 2.5rem;
+          font-style: italic;
+        }
+
+        /* ── HERO STAPLES ── */
+        .staples-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.75rem;
+        }
+
+        .staple {
+          display: flex;
+          flex-direction: column;
+          text-decoration: none;
+          color: inherit;
+          background: #fff;
+          box-shadow: 4px 4px 0 rgba(0,0,0,0.10), 10px 14px 34px rgba(0,0,0,0.09);
+          transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.28s;
+        }
+
+        .staple:hover {
+          transform: translateY(-8px);
+          box-shadow: 4px 4px 0 rgba(0,0,0,0.12), 18px 28px 52px rgba(0,0,0,0.16);
+        }
+
+        .staple-color {
+          height: 260px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .staple-color::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 55%);
+          pointer-events: none;
+        }
+
+        .staple-index {
+          position: absolute;
+          top: 1rem;
+          left: 1.1rem;
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 1.4rem;
+          letter-spacing: 0.1em;
+          color: rgba(255,255,255,0.8);
+          z-index: 1;
+        }
+
+        .staple-tag {
+          position: absolute;
+          top: 1.1rem;
+          right: 1.1rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          background: rgba(255,255,255,0.2);
+          backdrop-filter: blur(4px);
+          color: #fff;
+          padding: 3px 9px;
+          border-radius: 2px;
+          z-index: 1;
+        }
+
+        .staple-label {
+          padding: 1.4rem 1.5rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+
+        .staple-brand {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 0.75rem;
+          letter-spacing: 0.25em;
+          color: #b0a89c;
+          margin-bottom: 0.2rem;
+        }
+
+        .staple-name {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 1.15rem;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          text-transform: uppercase;
+          line-height: 1.15;
+          color: var(--ink);
+        }
+
+        .staple-desc {
+          font-size: 0.95rem;
+          line-height: 1.45;
+          color: #777;
+          font-style: italic;
+          margin-top: 0.5rem;
+          flex: 1;
+        }
+
+        .staple-foot {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1.1rem;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(26,26,24,0.08);
+        }
+
+        .staple-code {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          color: #aaa;
+          letter-spacing: 0.05em;
+        }
+
+        .staple-arrow {
+          color: var(--subtle);
+          display: inline-flex;
+          transition: transform 0.2s, color 0.2s;
+        }
+        .staple:hover .staple-arrow { transform: translate(3px, -3px); color: var(--ink); }
+
+        /* ── COLLECTIONS ── */
+        .collections-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+        }
+
+        .collection {
+          background: #fff;
+          border: 1.5px solid rgba(26,26,24,0.08);
+          overflow: hidden;
+          transition: box-shadow 0.25s, border-color 0.25s;
+        }
+
+        .collection.is-open {
+          box-shadow: 0 10px 34px rgba(0,0,0,0.08);
+          border-color: rgba(26,26,24,0.14);
+        }
+
+        .collection-head {
+          width: 100%;
+          display: flex;
+          align-items: stretch;
+          gap: 0;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          text-align: left;
+          padding: 0;
+        }
+
+        .collection-swatch {
+          width: 14px;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+        }
+        .collection-swatch-seg { flex: 1; }
+
+        .collection-meta {
+          padding: 1.4rem 1.5rem;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .collection-kicker {
+          display: block;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.58rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          margin-bottom: 0.35rem;
+        }
+
+        .collection-name {
+          display: block;
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 1.7rem;
+          letter-spacing: 0.03em;
+          line-height: 1;
+          color: var(--ink);
+        }
+
+        .collection-blurb {
+          display: block;
+          font-size: 0.95rem;
+          line-height: 1.45;
+          color: #888;
+          margin-top: 0.5rem;
+          max-width: 560px;
+        }
+
+        .collection-aside {
+          display: flex;
+          align-items: center;
+          gap: 1.1rem;
+          padding: 1.4rem 1.5rem;
+          flex-shrink: 0;
+        }
+
+        .collection-count {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          white-space: nowrap;
+        }
+
+        .collection-chevron {
+          color: var(--subtle);
+          display: inline-flex;
+          transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), color 0.2s;
+          transform: rotate(90deg);
+        }
+        .collection-chevron.up { transform: rotate(-90deg); color: var(--ink); }
+        .collection-head:hover .collection-chevron { color: var(--ink); }
+
+        .collection-body {
+          border-top: 1.5px solid rgba(26,26,24,0.06);
+          padding: 0.5rem 1.5rem 0.75rem;
+          animation: collectionOpen 0.35s cubic-bezier(0.16,1,0.3,1) both;
+        }
+
+        @keyframes collectionOpen {
+          from { opacity: 0; transform: translateY(-6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .collection-item {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 1rem 0.25rem;
+          text-decoration: none;
+          color: inherit;
+          border-bottom: 1px solid rgba(26,26,24,0.06);
+          transition: padding-left 0.18s;
+        }
+        .collection-item:last-child { border-bottom: none; }
+        .collection-item:hover { padding-left: 0.75rem; }
+
+        .collection-item-dot {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          flex-shrink: 0;
+        }
+
+        .collection-item-text { flex: 1; min-width: 0; }
+
+        .collection-item-name {
+          display: block;
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 0.01em;
+          text-transform: uppercase;
+          color: var(--ink);
+          line-height: 1.2;
+        }
+
+        .collection-item-desc {
+          display: block;
+          font-size: 0.9rem;
+          color: #999;
+          font-style: italic;
+          margin-top: 0.15rem;
+        }
+
+        .collection-item-tag {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          border: 1px solid rgba(26,26,24,0.12);
+          padding: 0.2rem 0.55rem;
+          border-radius: 2px;
+          flex-shrink: 0;
+        }
+
+        .collection-item-arrow {
+          color: var(--subtle);
+          display: inline-flex;
+          flex-shrink: 0;
+          transition: transform 0.18s, color 0.18s;
+        }
+        .collection-item:hover .collection-item-arrow { transform: translateX(3px); color: var(--ink); }
+
+        .collection-intro {
+          font-size: 1.08rem;
+          line-height: 1.7;
+          font-style: italic;
+          color: #555;
+          padding: 0.4rem 0 1rem 1.1rem;
+          margin: 0.6rem 0 0;
+          max-width: 640px;
+        }
+
+        .collection-palette {
+          display: flex;
+          align-items: center;
+          gap: 0.85rem;
+          flex-wrap: wrap;
+          padding: 0 0 1rem 1.1rem;
+          margin-bottom: 0.5rem;
+        }
+        .collection-palette-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.58rem;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--subtle);
+        }
+        .collection-palette-chips {
+          display: inline-flex;
+          box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+        }
+        .collection-palette-chip {
+          width: 26px;
+          height: 26px;
+          display: inline-block;
+        }
+        .collection-palette-name {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          color: var(--ink);
+        }
+        .collection-palette-mood {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          font-weight: 400;
+          letter-spacing: 0.06em;
+          text-transform: none;
+          color: var(--subtle);
+        }
+
+        /* ── BEYOND THE COLORS (writing) ── */
+        .writing-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.25rem;
+        }
+
+        .post-card {
+          display: flex;
+          flex-direction: column;
+          text-decoration: none;
+          color: inherit;
+          background: #fff;
+          border: 1.5px solid rgba(26,26,24,0.08);
+          overflow: hidden;
+          transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s, border-color 0.25s;
+        }
+        .post-card:hover {
+          transform: translateY(-5px);
+          border-color: rgba(26,26,24,0.16);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.10);
+        }
+
+        .post-stripe { height: 8px; width: 100%; }
+
+        .post-body {
+          padding: 1.6rem 1.7rem 1.7rem;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+
+        .post-kicker {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          margin-bottom: 0.7rem;
+        }
+
+        .post-title {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 1.7rem;
+          letter-spacing: 0.02em;
+          line-height: 1.02;
+          color: var(--ink);
+          margin-bottom: 0.6rem;
+        }
+
+        .post-excerpt {
+          font-size: 1.02rem;
+          line-height: 1.55;
+          color: #777;
+          font-style: italic;
+          flex: 1;
+        }
+
+        .post-foot {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1.2rem;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(26,26,24,0.08);
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          letter-spacing: 0.06em;
+          color: var(--subtle);
+        }
+        .post-foot .post-read { display: flex; align-items: center; gap: 0.5rem; color: var(--ink); }
+        .post-card:hover .post-foot .post-read svg { transform: translate(3px, -3px); }
+        .post-foot .post-read svg { transition: transform 0.2s; }
+
+        .writing-empty {
+          display: flex;
+          align-items: center;
+          gap: 1.5rem;
+          background: #fff;
+          border: 1.5px dashed rgba(26,26,24,0.18);
+          padding: 2rem 2.25rem;
+        }
+        .writing-empty-chip {
+          width: 56px;
+          height: 56px;
+          flex-shrink: 0;
+          border-radius: 3px;
+          background: repeating-linear-gradient(
+            135deg,
+            rgba(26,26,24,0.06) 0 10px,
+            rgba(26,26,24,0.02) 10px 20px
+          );
+          border: 1px solid rgba(26,26,24,0.1);
+        }
+        .writing-empty-title {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.95rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+          color: var(--ink);
+        }
+        .writing-empty-sub {
+          font-size: 1.05rem;
+          font-style: italic;
+          color: #888;
+          margin-top: 0.35rem;
+          max-width: 520px;
+        }
+
+        /* ── COLORS OVER TIME (chromatic timeline) ── */
+        .chrono { display: flex; flex-direction: column; }
+        .era { display: flex; gap: 1.75rem; }
+        .era-rail {
+          width: 18px;
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+        .era-node {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          border: 3px solid var(--bg);
+          margin-top: 5px;
+          flex-shrink: 0;
+          z-index: 1;
+          box-shadow: 0 0 0 1px rgba(26,26,24,0.12);
+        }
+        .era-node-ongoing { animation: pulse 2s infinite; }
+        .era-line { width: 3px; flex: 1; margin-top: -3px; border-radius: 2px; }
+        .era-card { flex: 1; min-width: 0; padding-bottom: 3rem; }
+        .era:last-child .era-card { padding-bottom: 0.5rem; }
+
+        .era-head {
+          display: flex;
+          align-items: baseline;
+          gap: 0.9rem;
+          flex-wrap: wrap;
+          margin-bottom: 0.35rem;
+        }
+        .era-years {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.7rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          color: var(--ink);
+        }
+        .era-code {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.06em;
+          color: var(--subtle);
+        }
+        .era-focus {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 2rem;
+          letter-spacing: 0.03em;
+          line-height: 1;
+          color: var(--ink);
+          margin-bottom: 0.6rem;
+        }
+        .era-interest {
+          font-size: 1.12rem;
+          line-height: 1.6;
+          color: #555;
+          max-width: 620px;
+          margin-bottom: 1.1rem;
+        }
+        .era-roles { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.1rem; }
+        .era-role {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          text-decoration: none;
+          border: 1.5px solid rgba(26,26,24,0.14);
+          padding: 0.35rem 0.75rem;
+          transition: all 0.18s;
+        }
+        .era-role:hover { color: var(--ink); border-color: var(--ink); }
+        .era-role svg { transition: transform 0.18s; }
+        .era-role:hover svg { transform: translateX(2px); }
+
+        .era-milestones { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; }
+        .era-milestones-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--subtle);
+        }
+        .era-milestone-chips { display: inline-flex; flex-wrap: wrap; gap: 0.5rem; }
+        .milestone-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.72rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          text-transform: uppercase;
+          color: var(--ink);
+          text-decoration: none;
+          background: #fff;
+          border: 1.5px solid rgba(26,26,24,0.1);
+          padding: 0.45rem 0.8rem;
+          border-radius: 2px;
+          transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+        }
+        .milestone-chip:hover {
+          transform: translateY(-2px);
+          border-color: rgba(26,26,24,0.22);
+          box-shadow: 3px 3px 0 rgba(0,0,0,0.06);
+        }
+        .milestone-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        /* Education band */
+        .edu-band { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid rgba(26,26,24,0.1); }
+        .edu-band-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          margin-bottom: 1rem;
+        }
+        .edu-band-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .edu-band-card {
+          display: flex;
+          align-items: stretch;
+          background: #fff;
+          border: 1.5px solid rgba(26,26,24,0.1);
+          cursor: pointer;
+          text-align: left;
+          overflow: hidden;
+          padding: 0;
+          transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .edu-band-card:hover {
+          transform: translateY(-3px);
+          border-color: rgba(26,26,24,0.2);
+          box-shadow: 4px 4px 16px rgba(0,0,0,0.08);
+        }
+        .edu-band-swatch { width: 10px; flex-shrink: 0; }
+        .edu-band-text { padding: 1.1rem 1.2rem; flex: 1; min-width: 0; }
+        .edu-band-degree {
+          display: block;
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.02em;
+          color: var(--ink);
+        }
+        .edu-band-sub {
+          display: block;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.58rem;
+          letter-spacing: 0.05em;
+          color: var(--subtle);
+          margin-top: 4px;
+        }
+        .edu-band-gpa {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 1.9rem;
+          line-height: 1;
+          color: var(--ink);
+          padding: 0 0.6rem;
+        }
+        .edu-band-gpa-label {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.5rem;
+          letter-spacing: 0.08em;
+          color: var(--subtle);
+          margin-top: 3px;
+        }
+        .edu-band-arrow {
+          color: var(--subtle);
+          padding: 0 1.1rem;
+          display: inline-flex;
+          align-items: center;
+          transition: transform 0.2s, color 0.2s;
+        }
+        .edu-band-card:hover .edu-band-arrow { transform: translate(2px,-2px); color: var(--ink); }
+
         /* ── TRANSIT MAP (HORIZONTAL) ── */
         .transit-wrapper {
           display: flex;
@@ -584,7 +1206,7 @@ export default function Home() {
           50%       { box-shadow: 0 0 0 5px transparent; }
         }
 
-        /* Color key — horizontal grid below the map */
+        /* Color key, horizontal grid below the map */
         .color-key {
           width: 100%;
         }
@@ -997,7 +1619,7 @@ export default function Home() {
 
         /* ─── TABLET / LARGE PHONE ─── */
         @media (max-width: 768px) {
-          /* NAV — stack logo above links, both centered */
+          /* NAV, stack logo above links, both centered */
           nav {
             padding: 0.9rem 1.25rem;
             flex-direction: column;
@@ -1008,7 +1630,7 @@ export default function Home() {
           .nav-links a { font-size: 0.65rem; }
           html { scroll-padding-top: 110px; }
 
-          /* HERO — fully stacked + centered */
+          /* HERO, fully stacked + centered */
           .hero {
             flex-direction: column;
             padding: 7rem 1.25rem 3rem;
@@ -1035,13 +1657,30 @@ export default function Home() {
           section { padding: 3.5rem 1.25rem; }
           .section-title { font-size: clamp(1.75rem, 7vw, 2.5rem); margin-bottom: 2rem; }
 
-          /* IMPACT TILES — already auto-fit, just shrink the big number */
+          /* IMPACT TILES, already auto-fit, just shrink the big number */
           #impact { padding: 2rem 1.25rem 0.5rem !important; }
 
           /* PROJECTS GRID + FILTER CHIPS */
           .swatches-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
 
-          /* TRANSIT MAP — hidden on mobile entirely; legend list only */
+          /* STAPLES, single column on phones */
+          .section-lede { font-size: 1rem; margin: -1.25rem 0 2rem; }
+          .staples-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+          .staple-color { height: 220px; }
+
+          /* COLLECTIONS, stack header + move count/chevron under text */
+          .collection-head { flex-wrap: wrap; }
+          .collection-meta { padding: 1.2rem 1.25rem 0.6rem; flex-basis: calc(100% - 12px); }
+          .collection-aside { padding: 0 1.25rem 1.2rem; width: 100%; justify-content: space-between; }
+          .collection-name { font-size: 1.5rem; }
+          .collection-item { gap: 0.75rem; }
+          .collection-item-tag { display: none; }
+          .collection-intro { font-size: 1rem; }
+
+          /* WRITING, single column on phones */
+          .writing-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+          /* TRANSIT MAP, hidden on mobile entirely; legend list only */
           .timeline-desktop { display: none; }
           .timeline-mobile  { display: none; }
           .key-title-desktop { display: none; }
@@ -1056,7 +1695,7 @@ export default function Home() {
           .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
           .color-preview { position: static; }
 
-          /* FOOTER — stack stacked */
+          /* FOOTER, stack stacked */
           footer {
             flex-direction: column;
             gap: 0.9rem;
@@ -1091,7 +1730,9 @@ export default function Home() {
           <a href="#" className="nav-logo">CHRISTOPHER BOWERS</a>
           <ul className="nav-links">
             <li><a href="#projects">Projects</a></li>
-            <li><a href="#process">Process</a></li>
+            <li><a href="#process">Timeline</a></li>
+            <li><Link href="/life">Life</Link></li>
+            <li><a href="#writing">Writing</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
@@ -1111,11 +1752,12 @@ export default function Home() {
 
           <div className="hero-aside">
             <p className="hero-body">
-              CS graduate student at the University of Florida building software that
-              moves operations. From forecasting and fulfillment systems at The Feed,
-              to risk infrastructure for an algorithmic investment fund, to NASA
-              eye-tracking research and LLM pipelines — I write code where the
-              metric is real-world throughput.
+              I&apos;m a CS grad student at UF who likes building software that moves
+              real operations. I started in finance, wandered through NASA
+              eye-tracking research and LLMs along the way, and now build
+              forecasting and fulfillment systems at The Feed. The work I care
+              about is the kind where the metric is something real, orders out
+              the door, not story points.
             </p>
             <div className="hero-links">
               <a href="#projects" className="btn btn-primary">View Operations Work</a>
@@ -1125,288 +1767,197 @@ export default function Home() {
           </div>
         </section>
 
-        {/* IMPACT STRIP */}
-        <section id="impact" style={{ padding: "3rem 3rem 1rem" }}>
-          <div className="section-label">By the Numbers</div>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "1.5rem",
-            marginTop: "1rem",
-          }}>
-            {[
-              { stat: "+100%", label: "Warehouse capacity expansion", sub: "The Feed · 2026" },
-              { stat: "30%", label: "Faster order fulfillment", sub: "The Feed · 2026" },
-              { stat: "$750M+", label: "Client portfolio supported", sub: "Morgan Stanley · 2024" },
-            ].map((tile) => (
-                <div key={tile.label} style={{
-                  background: "#fff",
-                  border: "1.5px solid rgba(26,26,24,0.08)",
-                  padding: "1.6rem 1.4rem",
-                  boxShadow: "2px 2px 0 rgba(0,0,0,0.06)",
-                }}>
-                  <div style={{
-                    fontFamily: "'Bebas Neue', sans-serif",
-                    fontSize: "2.6rem",
-                    letterSpacing: "0.02em",
-                    lineHeight: 1,
-                    color: "#2A6E3F",
-                  }}>{tile.stat}</div>
-                  <div style={{
-                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                    fontSize: "0.85rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.02em",
-                    textTransform: "uppercase",
-                    marginTop: "0.6rem",
-                    color: "var(--ink)",
-                  }}>{tile.label}</div>
-                  <div style={{
-                    fontFamily: "'Space Mono', monospace",
-                    fontSize: "0.6rem",
-                    letterSpacing: "0.08em",
-                    color: "var(--subtle)",
-                    marginTop: "0.35rem",
-                  }}>{tile.sub}</div>
-                </div>
-            ))}
-          </div>
-        </section>
-
         {/* PROJECTS */}
         <section id="projects" style={{ background: "rgba(0,0,0,0.02)" }}>
-          <div className="section-label">The Collection</div>
-          <div className="section-title">OPERATIONS · RESEARCH · SYSTEMS</div>
-          <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginBottom: "2rem" }}>
-            {(["All", "Operations", "Project", "Research", "Publication"] as const).map((f) => {
-              const active = projectFilter === f;
-              return (
-                  <button
-                      key={f}
-                      onClick={() => setProjectFilter(f)}
-                      style={{
-                        fontFamily: "'Space Mono', monospace",
-                        fontSize: "0.65rem",
-                        letterSpacing: "0.12em",
-                        textTransform: "uppercase",
-                        padding: "0.55rem 1.1rem",
-                        cursor: "pointer",
-                        border: active ? "1.5px solid var(--ink)" : "1.5px solid rgba(26,26,24,0.15)",
-                        background: active ? "var(--ink)" : "transparent",
-                        color: active ? "var(--bg)" : "var(--ink)",
-                        transition: "all 0.15s",
-                      }}
-                  >
-                    {f}
-                  </button>
-              );
-            })}
-          </div>
-          <div className="swatches-grid">
-            {visibleProjects.map((p) => (
-                <Link key={p.name} href={`/projects/${p.slug}`} className="swatch">
-                  <div className="swatch-color" style={{ background: p.color.hex }}>
-                <span style={{
-                  position: "absolute", top: 10, right: 10,
-                  fontFamily: "'Space Mono', monospace",
-                  fontSize: "0.6rem", letterSpacing: "0.1em",
-                  background: "rgba(255,255,255,0.2)",
-                  color: "#fff", padding: "2px 7px", borderRadius: 2,
-                  backdropFilter: "blur(4px)",
-                  zIndex: 1,
-                }}>{p.tag}</span>
+          <div className="section-label">The 2026 Palette</div>
+          <div className="section-title">COLORS OF THE YEAR</div>
+          <p className="section-lede">
+            My best work from 2026, kept in full color. Everything older is
+            filed into the collections further down.
+          </p>
+
+          {/* HERO STAPLES, vivid, oversized chips */}
+          <div className="staples-grid">
+            {heroProjects.map((p, i) => (
+                <Link key={p.slug} href={`/projects/${p.slug}`} className="staple">
+                  <div className="staple-color" style={{ background: p.color.hex }}>
+                    <span className="staple-index">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="staple-tag">{p.tag}</span>
                   </div>
-                  <div className="swatch-label">
-                    <div className="swatch-name">{p.name}</div>
-                    <div className="swatch-desc">{p.desc}</div>
-                    <div className="swatch-link">{p.color.code} · {p.color.name}</div>
+                  <div className="staple-label">
+                    <div className="staple-brand">Pantone® · 2026</div>
+                    <div className="staple-name">{p.name}</div>
+                    <div className="staple-desc">{p.desc}</div>
+                    <div className="staple-foot">
+                      <span className="staple-code">{p.color.code} · {p.color.name}</span>
+                      <span className="staple-arrow"><ArrowUpRight /></span>
+                    </div>
                   </div>
                 </Link>
             ))}
           </div>
+
+          {/* COLLECTIONS, deep heritage palette, expandable archives */}
+          <div className="section-label" style={{ marginTop: "5rem" }}>The Heritage Palette</div>
+          <div className="section-title" style={{ marginBottom: "0.5rem" }}>THE COLLECTIONS</div>
+          <p className="section-lede">
+            The rest, grouped by theme. Open one to read what that work is
+            actually about, and see the projects inside.
+          </p>
+
+          <div className="collections-list">
+            {collectionGroups.map((c) => {
+              const open = openCollection === c.slug;
+              return (
+                  <div key={c.slug} className={`collection ${open ? "is-open" : ""}`}>
+                    <button
+                        className="collection-head"
+                        onClick={() => setOpenCollection(open ? null : c.slug)}
+                        aria-expanded={open}
+                    >
+                      <span className="collection-swatch">
+                        {c.palette.colors.map((col, ci) => (
+                            <span key={ci} className="collection-swatch-seg" style={{ background: col }} />
+                        ))}
+                      </span>
+                      <span className="collection-meta">
+                        <span className="collection-kicker">{c.kicker}</span>
+                        <span className="collection-name">{c.name}</span>
+                        <span className="collection-blurb">{c.blurb}</span>
+                      </span>
+                      <span className="collection-aside">
+                        <span className="collection-count">
+                          {c.projects.length} {c.projects.length === 1 ? "project" : "projects"}
+                        </span>
+                        <span className={`collection-chevron ${open ? "up" : ""}`}>
+                          <ArrowRight />
+                        </span>
+                      </span>
+                    </button>
+
+                    {open && (
+                        <div className="collection-body">
+                          <p className="collection-intro" style={{ borderLeft: `3px solid ${c.color.hex}` }}>
+                            {c.longIntro}
+                          </p>
+                          <div className="collection-palette">
+                            <span className="collection-palette-label">Palette</span>
+                            <span className="collection-palette-chips">
+                              {c.palette.colors.map((col, ci) => (
+                                  <span key={ci} className="collection-palette-chip" style={{ background: col }} />
+                              ))}
+                            </span>
+                            <span className="collection-palette-name">
+                              {c.palette.name} <span className="collection-palette-mood">· {c.palette.mood}</span>
+                            </span>
+                          </div>
+                          {c.projects.map((p) => (
+                              <Link key={p.slug} href={`/projects/${p.slug}`} className="collection-item">
+                                <span className="collection-item-dot" style={{ background: p.color.hex }} />
+                                <span className="collection-item-text">
+                                  <span className="collection-item-name">{p.name}</span>
+                                  <span className="collection-item-desc">{p.desc}</span>
+                                </span>
+                                <span className="collection-item-tag">{p.tag}</span>
+                                <span className="collection-item-arrow"><ArrowRight /></span>
+                              </Link>
+                          ))}
+                        </div>
+                    )}
+                  </div>
+              );
+            })}
+          </div>
         </section>
 
-        {/* TRANSIT MAP — HORIZONTAL, 2022 left / 2027 right */}
+        {/* COLORS OVER TIME, chromatic timeline of interests + milestones */}
         <section id="process">
-          <div className="section-label">Color Process</div>
-          <div className="section-title">EDUCATION &amp; EXPERIENCE</div>
-          <div className="transit-wrapper">
+          <div className="section-label">A Palette That Evolves</div>
+          <div className="section-title">COLORS OVER TIME</div>
+          <p className="section-lede">
+            My focus has moved around a lot, finance, then research, then machine
+            learning, now operations, and each shift shows up here as a new color.
+            The major projects are pinned where they happened.
+          </p>
 
-            {/* Horizontal Map — DESKTOP (full 2022–2027 window) */}
-            <div className="transit-map timeline-desktop">
-              {/* X axis — year labels */}
-              <div className="transit-x-axis">
-                {YEAR_MARKS.map((yr) => (
-                    <span key={yr} className="axis-year-label">{yr}</span>
-                ))}
-              </div>
-
-              {/* Tracks */}
-              <div className="tracks-area" style={{ height: TRACKS.length * 36 + 20, position: "relative" }}>
-                {TRACKS.map((track, i) => {
-                  const MAP_W_PCT = 100;
-                  const endM = trackEnd(track);
-                  const leftPct  = (track.start / TOTAL_MONTHS) * MAP_W_PCT;
-                  const widthPct = ((endM - track.start) / TOTAL_MONTHS) * MAP_W_PCT;
-                  const topPx    = 10 + i * 36;
-                  return (
-                      <div key={track.label}>
-                        <div
-                            className="track-row"
-                            style={{
-                              left: `${leftPct}%`,
-                              width: `${widthPct}%`,
-                              top: topPx,
-                              background: track.color,
-                            }}
-                        />
-                        {/* Left dot = start */}
-                        <div
-                            className="track-dot-h track-dot-h-start"
-                            style={{ left: `${leftPct}%`, top: topPx + 7, color: track.color, borderColor: track.color }}
-                        />
-                        {/* Right dot = end / ongoing */}
-                        <div
-                            className={`track-dot-h ${track.ongoing ? "track-dot-h-ongoing" : "track-dot-h-end"}`}
-                            style={{
-                              left: `${leftPct + widthPct}%`,
-                              top: topPx + 7,
-                              color: track.color,
-                              borderColor: track.color,
-                              background: track.ongoing ? "var(--bg)" : track.color,
-                            }}
-                        />
-                      </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Horizontal Map — MOBILE (condensed 24-month window) */}
-            <div className="transit-map timeline-mobile">
-              <div className="mobile-window-note">
-                <span>Recent · {MOBILE_YEAR_MARKS[0]}–{MOBILE_YEAR_MARKS[MOBILE_YEAR_MARKS.length - 1]}</span>
-                <span className="mobile-window-hint">Older roles in legend below</span>
-              </div>
-              <div className="transit-x-axis">
-                {MOBILE_YEAR_MARKS.map((yr) => (
-                    <span key={yr} className="axis-year-label">{yr}</span>
-                ))}
-              </div>
-              {(() => {
-                const visible = TRACKS
-                    .map((t) => {
-                      const realEnd = trackEnd(t);
-                      const vStart = Math.max(t.start, MOBILE_START);
-                      const vEnd   = Math.min(realEnd, MOBILE_END);
-                      if (vEnd <= MOBILE_START || vStart >= MOBILE_END) return null;
-                      return {
-                        ...t,
-                        vStart, vEnd,
-                        clipL: t.start < MOBILE_START,
-                        clipR: realEnd > MOBILE_END,
-                      };
-                    })
-                    .filter((t): t is NonNullable<typeof t> => t !== null);
-                return (
-                    <div className="tracks-area" style={{ height: visible.length * 44 + 12, position: "relative" }}>
-                      {visible.map((t, i) => {
-                        const leftPct  = ((t.vStart - MOBILE_START) / MOBILE_MONTHS) * 100;
-                        const widthPct = ((t.vEnd - t.vStart) / MOBILE_MONTHS) * 100;
-                        const topPx    = 6 + i * 44;
-                        return (
-                            <div key={t.label}>
-                              <div
-                                  className="track-row mobile-track-row"
-                                  style={{
-                                    left: `${leftPct}%`,
-                                    width: `${widthPct}%`,
-                                    top: topPx,
-                                    background: t.color,
-                                    borderTopLeftRadius:    t.clipL ? 0 : 5,
-                                    borderBottomLeftRadius: t.clipL ? 0 : 5,
-                                    borderTopRightRadius:    t.clipR ? 0 : 5,
-                                    borderBottomRightRadius: t.clipR ? 0 : 5,
-                                  }}
-                              />
-                              {!t.clipL && (
-                                  <div className="track-dot-h track-dot-h-start"
-                                       style={{ left: `${leftPct}%`, top: topPx + 7, color: t.color, borderColor: t.color }} />
-                              )}
-                              {!t.clipR && (
-                                  <div className={`track-dot-h ${t.ongoing ? "track-dot-h-ongoing" : "track-dot-h-end"}`}
-                                       style={{
-                                         left: `${leftPct + widthPct}%`,
-                                         top: topPx + 7,
-                                         color: t.color,
-                                         borderColor: t.color,
-                                         background: t.ongoing ? "var(--bg)" : t.color,
-                                       }} />
-                              )}
-                              <div className="mobile-track-label" style={{ top: topPx + 18, color: t.color }}>
-                                {t.label}
-                              </div>
-                            </div>
-                        );
-                      })}
+          <div className="chrono">
+            {ERAS.slice().reverse().map((era, i) => {
+              const last = i === ERAS.length - 1;
+              return (
+                  <div key={era.focus} className="era">
+                    <div className="era-rail">
+                      <span
+                          className={`era-node ${era.ongoing ? "era-node-ongoing" : ""}`}
+                          style={{ background: era.color.hex, color: era.color.hex }}
+                      />
+                      <span
+                          className="era-line"
+                          style={{
+                            background: last
+                                ? `linear-gradient(${era.color.hex}, transparent)`
+                                : era.color.hex,
+                          }}
+                      />
                     </div>
-                );
-              })()}
-            </div>
+                    <div className="era-card">
+                      <div className="era-head">
+                        <span className="era-years">{era.years}</span>
+                        <span className="era-code">{era.color.code} · {era.color.name}</span>
+                      </div>
+                      <div className="era-focus">{era.focus}</div>
+                      <p className="era-interest">{era.interest}</p>
 
-            {/* Legend grid */}
-            <div className="color-key">
-              <div className="key-title key-title-desktop">Legend</div>
-              <div className="key-title key-title-mobile">Experience</div>
-              <div className="key-grid">
-                {TRACKS.map((track) => {
-                  const isEdu = track.label === "B.S. Computer Science" || track.label === "M.S. Computer Science";
-                  const eduKey = track.label === "B.S. Computer Science" ? "bs" : "ms";
-                  if (isEdu) {
-                    return (
-                        <button key={track.label} className="key-item" style={{ border: "none", cursor: "pointer", textAlign: "left", width: "100%" }}
-                                onClick={() => setEduModal(eduKey as "bs" | "ms")}
-                        >
-                          <div className="key-swatch" style={{ background: track.color }} />
-                          <div className="key-text">
-                            <div className="key-name">{track.label}</div>
-                            <div className="key-sub">{track.sub}</div>
+                      {era.roles.length > 0 && (
+                          <div className="era-roles">
+                            {era.roles.map((r) => (
+                                <Link key={r.label} href={r.link} className="era-role">
+                                  {r.label}<ArrowRight />
+                                </Link>
+                            ))}
                           </div>
-                          <span className="key-arrow"><ArrowUpRight /></span>
-                        </button>
-                    );
-                  }
-                  return (
-                      <Link key={track.label} href={track.link} className="key-item"
-                            target={track.link.startsWith("http") ? "_blank" : undefined}
-                            rel={track.link.startsWith("http") ? "noreferrer" : undefined}
-                      >
-                        <div className="key-swatch" style={{ background: track.color }} />
-                        <div className="key-text">
-                          <div className="key-name">{track.label}</div>
-                          <div className="key-sub">{track.sub}</div>
-                        </div>
-                        <span className="key-arrow"><ArrowRight /></span>
-                      </Link>
-                  );
-                })}
-              </div>
-              <div style={{ marginTop: "1.2rem", display: "flex", gap: "1.5rem", flexWrap: "wrap" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2.5px solid #888", background: "var(--bg)", flexShrink: 0 }} />
-                  <span className="key-dot-label">Start date</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#888", flexShrink: 0 }} />
-                  <span className="key-dot-label">End date</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                  <div style={{ width: 12, height: 12, borderRadius: "50%", border: "2.5px solid #888", background: "var(--bg)", flexShrink: 0, animation: "pulse 2s infinite" }} />
-                  <span className="key-dot-label">Ongoing</span>
-                </div>
-              </div>
-            </div>
+                      )}
 
+                      {era.milestones.length > 0 && (
+                          <div className="era-milestones">
+                            <span className="era-milestones-label">Milestone{era.milestones.length > 1 ? "s" : ""}</span>
+                            <span className="era-milestone-chips">
+                              {era.milestones.map((slug) => {
+                                const p = PROJECTS.find((pr) => pr.slug === slug);
+                                if (!p) return null;
+                                return (
+                                    <Link key={slug} href={`/projects/${p.slug}`} className="milestone-chip">
+                                      <span className="milestone-dot" style={{ background: p.color.hex }} />
+                                      {p.name}
+                                    </Link>
+                                );
+                              })}
+                            </span>
+                          </div>
+                      )}
+                    </div>
+                  </div>
+              );
+            })}
+          </div>
+
+          {/* Education, kept as clickable chips into the coursework modals */}
+          <div className="edu-band">
+            <div className="edu-band-label">Education</div>
+            <div className="edu-band-grid">
+              {EDU_TRACKS.map((t) => (
+                  <button key={t.key} className="edu-band-card" onClick={() => setEduModal(t.key)}>
+                    <span className="edu-band-swatch" style={{ background: t.color }} />
+                    <span className="edu-band-text">
+                      <span className="edu-band-degree">{t.degree}</span>
+                      <span className="edu-band-sub">{t.sub}</span>
+                    </span>
+                    <span className="edu-band-gpa">
+                      {t.gpa}<span className="edu-band-gpa-label">GPA</span>
+                    </span>
+                    <span className="edu-band-arrow"><ArrowUpRight /></span>
+                  </button>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -1505,11 +2056,49 @@ export default function Home() {
             </div>
         )}
 
+        {/* BEYOND THE COLORS, writing / opinion (LaTeX PDF pieces) */}
+        <section id="writing">
+          <div className="section-label">Off the Swatch</div>
+          <div className="section-title">BEYOND THE COLORS</div>
+          <p className="section-lede">
+            Essays and opinions on the work, where the metric should be,
+            what a system owes the people who depend on it, and the odd tangent.
+          </p>
+          {PUBLISHED_POSTS.length > 0 ? (
+              <div className="writing-grid">
+                {PUBLISHED_POSTS.map((post) => (
+                    <a key={post.slug} href={post.pdf} target="_blank" rel="noreferrer" className="post-card">
+                      <div className="post-stripe" style={{ background: post.color.hex }} />
+                      <div className="post-body">
+                        <div className="post-kicker">{post.kicker}</div>
+                        <div className="post-title">{post.title}</div>
+                        <div className="post-excerpt">{post.excerpt}</div>
+                        <div className="post-foot">
+                          <span>{formatPostDate(post.date)}</span>
+                          <span className="post-read">Read PDF <ArrowUpRight /></span>
+                        </div>
+                      </div>
+                    </a>
+                ))}
+              </div>
+          ) : (
+              <div className="writing-empty">
+                <div className="writing-empty-chip" />
+                <div>
+                  <div className="writing-empty-title">No pieces mixed yet</div>
+                  <div className="writing-empty-sub">
+                    Essays and opinion pieces will land here soon, this is where the writing lives.
+                  </div>
+                </div>
+              </div>
+          )}
+        </section>
+
         {/* CONTACT */}
         <section id="contact" style={{ background: "rgba(0,0,0,0.02)" }}>
           <div className="section-title">GET IN TOUCH</div>
           <div className="contact-inner">
-            {/* Live color chip — driven by name hash */}
+            {/* Live color chip, driven by name hash */}
             <div className="color-preview">
               <div className="preview-swatch" style={{ background: nameColor.hsl, transition: "background 0.6s ease" }} />
               <div className="preview-label">
@@ -1535,7 +2124,7 @@ export default function Home() {
             {/* Form */}
             {submitted ? (
                 <div className="submit-success">
-                  ✓ COLOR MIXED — I&apos;ll be in touch soon.
+                  ✓ COLOR MIXED, I&apos;ll be in touch soon.
                 </div>
             ) : (
                 <form
@@ -1553,12 +2142,28 @@ export default function Home() {
                             colorName: nameColor.pantone,
                             colorCode: nameColor.code,
                             colorHsl: nameColor.hsl,
+                            company: honeypot,              // honeypot, must stay empty
+                            renderedAt: formRenderedAt.current ?? Date.now(), // bot-timing guard
                           }),
                         });
-                      } catch (_) {}
+                      } catch {}
                       setSubmitted(true);
                     }}
                 >
+                  {/* Honeypot, hidden from humans, irresistible to bots. */}
+                  <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "-9999px", width: 1, height: 1, overflow: "hidden" }}>
+                    <label>
+                      Company (leave blank)
+                      <input
+                          type="text"
+                          name="company"
+                          tabIndex={-1}
+                          autoComplete="off"
+                          value={honeypot}
+                          onChange={(e) => setHoneypot(e.target.value)}
+                      />
+                    </label>
+                  </div>
                   <div className="form-field">
                     <label className="form-label">Your Name</label>
                     <input
@@ -1567,6 +2172,7 @@ export default function Home() {
                         placeholder="Jane Smith"
                         value={formData.name}
                         onChange={handleInput}
+                        maxLength={100}
                         required
                     />
                   </div>
@@ -1579,6 +2185,7 @@ export default function Home() {
                         placeholder="jane@example.com"
                         value={formData.email}
                         onChange={handleInput}
+                        maxLength={254}
                         required
                     />
                   </div>
@@ -1590,6 +2197,7 @@ export default function Home() {
                         placeholder="Let's build something together..."
                         value={formData.message}
                         onChange={handleInput}
+                        maxLength={4000}
                         required
                     />
                   </div>

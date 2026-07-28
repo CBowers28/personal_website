@@ -3,12 +3,13 @@
 import { use } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { PROJECTS } from "@/lib/projects";
+import { PROJECTS, COLLECTION_BY_SLUG } from "@/lib/projects";
 
 export default function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = use(params);
     const project = PROJECTS.find((p) => p.slug === slug);
     if (!project) notFound();
+    const collection = project.collection ? COLLECTION_BY_SLUG[project.collection] : undefined;
 
     return (
         <>
@@ -16,7 +17,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap');
 
         :root {
-          --bg: #F2EFE4;
+          --bg: #F8F6F0;
           --ink: #1A1A18;
           --subtle: #9A9088;
         }
@@ -38,7 +39,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
           display: flex;
           align-items: center;
           justify-content: space-between;
-          background: rgba(242,239,228,0.9);
+          background: rgba(248,246,240,0.9);
           backdrop-filter: blur(10px);
           border-bottom: 1px solid rgba(26,26,24,0.08);
         }
@@ -172,6 +173,39 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
           margin-bottom: 3.5rem;
         }
 
+        .context-panel {
+          background: #fff;
+          border-left: 3px solid #999;
+          padding: 1.5rem 1.75rem;
+          margin-bottom: 3.5rem;
+          box-shadow: 2px 2px 0 rgba(0,0,0,0.05);
+        }
+        .context-kicker {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.62rem;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          margin-bottom: 0.75rem;
+        }
+        .context-body {
+          font-size: 1.08rem;
+          line-height: 1.7;
+          color: #555;
+          font-style: italic;
+        }
+        .context-link {
+          display: inline-block;
+          margin-top: 1rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.65rem;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .context-link:hover { color: var(--ink); }
+
         .highlights-list {
           list-style: none;
           margin-bottom: 3.5rem;
@@ -296,6 +330,18 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
                 <div className="detail-content">
                     <div className="detail-section-label">Overview</div>
                     <p className="detail-full-desc">{project.fullDescription}</p>
+
+                    {collection && (
+                        <div className="context-panel" style={{ borderColor: collection.color.hex }}>
+                            <div className="context-kicker" style={{ color: collection.color.hex }}>
+                                Part of · {collection.name}
+                            </div>
+                            <p className="context-body">{collection.longIntro}</p>
+                            <Link href="/#projects" className="context-link">
+                                Browse the full collection →
+                            </Link>
+                        </div>
+                    )}
 
                     <div className="detail-section-label">Highlights</div>
                     <ul className="highlights-list">
