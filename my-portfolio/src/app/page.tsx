@@ -387,7 +387,7 @@ export default function Home() {
         }
 
         /* ── SECTION HEADER ── */
-        section { padding: 6rem 3rem; }
+        section { padding: 4rem 3rem; }
 
         .section-label {
           font-family: 'Space Mono', monospace;
@@ -1799,7 +1799,7 @@ export default function Home() {
 
           {/* COLLECTIONS, deep heritage palette, expandable archives */}
           <div className="section-label" style={{ marginTop: "5rem" }}>The Heritage Palette</div>
-          <div className="section-title" style={{ marginBottom: "0.5rem" }}>THE COLLECTIONS</div>
+          <div className="section-title">THE COLLECTIONS</div>
           <p className="section-lede">
             The rest, grouped by theme. Open one to read what that work is
             actually about, and see the projects inside.
