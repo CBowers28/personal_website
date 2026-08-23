@@ -1,0 +1,130 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  CI / CD pipeline for personal_website
+# ═══════════════════════════════════════════════════════════════════════
+#
+#  ┌─────────────────────────────────────────────────────────────────┐
+#  │  ⚠  KEEP THIS PIPELINE IN SYNC WITH THE CODEBASE                 │
+#  │                                                                   │
+#  │  When you integrate a MAJOR change, add a matching step here so  │
+#  │  the feature is actually exercised in CI. For example:           │
+#  │    • New test suite / framework  → add a job or step to run it   │
+#  │    • Database or migrations       → add a migration check         │
+#  │    • E2E / visual tests           → add a Playwright/Cypress job  │
+#  │    • New workspace / package       → add it to the matrix below   │
+#  │    • New env vars the build needs  → wire them in as secrets      │
+#  │  A feature that isn't in the pipeline is a feature CI can't       │
+#  │  protect. See CONTRIBUTING.md for the full checklist.            │
+#  └─────────────────────────────────────────────────────────────────┘
+#
+#  Deployment: production hosting is handled by Vercel's Git integration
+#  (auto-deploys `main`). The `quality` job below is the gate that must be
+#  green before that deploy is trusted. An optional `deploy` job is included
+#  for teams that prefer CLI-driven CD — it stays dormant until the Vercel
+#  secrets are configured (see the job for details).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ─── Main app: the Next.js portfolio in my-portfolio/ ───────────────
+  quality:
+    name: Lint · Typecheck · Test · Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: my-portfolio
+    strategy:
+      fail-fast: false
+      matrix:
+        # Test on the Node versions the app is expected to run on
+        # (Vercel currently builds on 22.x; 20.x is the active LTS floor).
+        node-version: [20.x, 22.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+          cache-dependency-path: my-portfolio/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+  # ─── Root workspace: the small standalone TS entrypoint ─────────────
+  root-build:
+    name: Root TypeScript build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  # ─── Optional CD: CLI-driven production deploy to Vercel ────────────
+  #  Dormant by default. To enable, add these repository secrets:
+  #    VERCEL_TOKEN · VERCEL_ORG_ID · VERCEL_PROJECT_ID
+  #  Only enable this if you are NOT already using Vercel's native Git
+  #  integration, otherwise `main` would deploy twice.
+  deploy:
+    name: Deploy (Vercel)
+    runs-on: ubuntu-latest
+    needs: [quality, root-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && vars.ENABLE_VERCEL_DEPLOY == 'true'
+    defaults:
+      run:
+        working-directory: my-portfolio
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Deploy to Vercel
+        run: |
+          npm i -g vercel@latest
+          vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
+          vercel build --prod --token="$VERCEL_TOKEN"
+          vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
