@@ -27,7 +27,7 @@ export default function LifePage() {
         body {
           background: var(--bg);
           color: var(--ink);
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--font-advercase), 'Cormorant Garamond', Georgia, serif;
           min-height: 100vh;
         }
 
@@ -70,7 +70,7 @@ export default function LifePage() {
           color: var(--subtle); margin-bottom: 0.5rem;
         }
         .life-title {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: clamp(2.8rem, 7vw, 4.5rem);
           letter-spacing: 0.03em; line-height: 1; margin-bottom: 1.25rem;
         }
@@ -94,7 +94,7 @@ export default function LifePage() {
         .facet-stripe { height: 8px; width: 100%; }
         .facet-body { padding: 1.6rem 1.7rem 1.7rem; }
         .facet-label {
-          font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif; font-size: 1.5rem;
           letter-spacing: 0.03em; color: var(--ink); margin-bottom: 0.55rem;
         }
         .facet-text { font-size: 1.02rem; line-height: 1.55; color: #999; font-style: italic; }

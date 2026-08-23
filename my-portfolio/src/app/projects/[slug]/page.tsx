@@ -27,7 +27,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
         body {
           background: var(--bg);
           color: var(--ink);
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--font-advercase), 'Cormorant Garamond', Georgia, serif;
           min-height: 100vh;
         }
 
@@ -114,7 +114,7 @@ export default function ProjectPage({ params }: { params: Promise<{ slug: string
         }
 
         .chip-name-large {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: clamp(2rem, 4vw, 3rem);
           letter-spacing: 0.03em;
           line-height: 1;

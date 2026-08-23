@@ -204,7 +204,7 @@ export default function Home() {
         body {
           background: var(--bg);
           color: var(--ink);
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--font-advercase), 'Cormorant Garamond', Georgia, serif;
           overflow-x: hidden;
         }
 
@@ -223,7 +223,7 @@ export default function Home() {
         }
 
         .nav-logo {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.4rem;
           letter-spacing: 0.15em;
           color: var(--ink);
@@ -289,7 +289,7 @@ export default function Home() {
         }
 
         .chip-brand {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1rem;
           letter-spacing: 0.25em;
           color: #888;
@@ -297,7 +297,7 @@ export default function Home() {
         }
 
         .chip-name {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: clamp(2rem, 5vw, 3.6rem);
           font-weight: 700;
           letter-spacing: -0.02em;
@@ -333,7 +333,7 @@ export default function Home() {
         }
 
         .hero-tagline {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 3.5rem;
           line-height: 1;
           letter-spacing: 0.03em;
@@ -399,7 +399,7 @@ export default function Home() {
         }
 
         .section-title {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: clamp(2.5rem, 5vw, 4rem);
           letter-spacing: 0.03em;
           line-height: 1;
@@ -452,14 +452,14 @@ export default function Home() {
         }
 
         .swatch-brand {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 0.7rem;
           letter-spacing: 0.2em;
           color: #999;
         }
 
         .swatch-name {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.85rem;
           font-weight: 700;
           letter-spacing: -0.01em;
@@ -535,7 +535,7 @@ export default function Home() {
           position: absolute;
           top: 1rem;
           left: 1.1rem;
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.4rem;
           letter-spacing: 0.1em;
           color: rgba(255,255,255,0.8);
@@ -566,7 +566,7 @@ export default function Home() {
         }
 
         .staple-brand {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 0.75rem;
           letter-spacing: 0.25em;
           color: #b0a89c;
@@ -574,7 +574,7 @@ export default function Home() {
         }
 
         .staple-name {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 1.15rem;
           font-weight: 700;
           letter-spacing: -0.01em;
@@ -672,7 +672,7 @@ export default function Home() {
 
         .collection-name {
           display: block;
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.7rem;
           letter-spacing: 0.03em;
           line-height: 1;
@@ -749,7 +749,7 @@ export default function Home() {
 
         .collection-item-name {
           display: block;
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.9rem;
           font-weight: 700;
           letter-spacing: 0.01em;
@@ -821,7 +821,7 @@ export default function Home() {
           display: inline-block;
         }
         .collection-palette-name {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.8rem;
           font-weight: 700;
           letter-spacing: 0.03em;
@@ -879,7 +879,7 @@ export default function Home() {
         }
 
         .post-title {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.7rem;
           letter-spacing: 0.02em;
           line-height: 1.02;
@@ -932,7 +932,7 @@ export default function Home() {
           border: 1px solid rgba(26,26,24,0.1);
         }
         .writing-empty-title {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.95rem;
           font-weight: 700;
           text-transform: uppercase;
@@ -993,7 +993,7 @@ export default function Home() {
           color: var(--subtle);
         }
         .era-focus {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 2rem;
           letter-spacing: 0.03em;
           line-height: 1;
@@ -1039,7 +1039,7 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           gap: 0.5rem;
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.72rem;
           font-weight: 700;
           letter-spacing: 0.02em;
@@ -1090,7 +1090,7 @@ export default function Home() {
         .edu-band-text { padding: 1.1rem 1.2rem; flex: 1; min-width: 0; }
         .edu-band-degree {
           display: block;
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.85rem;
           font-weight: 700;
           text-transform: uppercase;
@@ -1110,7 +1110,7 @@ export default function Home() {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.9rem;
           line-height: 1;
           color: var(--ink);
@@ -1212,7 +1212,7 @@ export default function Home() {
         }
 
         .key-title {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.6rem;
           letter-spacing: 0.06em;
           color: var(--ink);
@@ -1255,7 +1255,7 @@ export default function Home() {
         }
 
         .key-name {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.85rem;
           font-weight: 700;
           letter-spacing: 0.02em;
@@ -1363,7 +1363,7 @@ export default function Home() {
         }
 
         .edu-card-degree {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.9rem;
           font-weight: 700;
           letter-spacing: 0.02em;
@@ -1381,7 +1381,7 @@ export default function Home() {
         }
 
         .edu-card-gpa {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 2rem;
           letter-spacing: 0.04em;
           color: var(--ink);
@@ -1431,7 +1431,7 @@ export default function Home() {
         }
 
         .edu-course-grade {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.6rem;
           font-weight: 700;
           padding: 1px 4px;
@@ -1489,14 +1489,14 @@ export default function Home() {
         }
 
         .preview-brand {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 0.75rem;
           letter-spacing: 0.2em;
           color: #999;
         }
 
         .preview-name {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: 1.6rem;
           letter-spacing: 0.04em;
           color: var(--ink);
@@ -1534,7 +1534,7 @@ export default function Home() {
           border: none;
           border-bottom: 1.5px solid rgba(26,26,24,0.2);
           padding: 0.6rem 0;
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: var(--font-advercase), 'Cormorant Garamond', Georgia, serif;
           font-size: 1.05rem;
           color: var(--ink);
           outline: none;
@@ -1605,7 +1605,7 @@ export default function Home() {
         .mobile-track-label {
           position: absolute;
           left: 0;
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-family: var(--font-advercase), 'Helvetica Neue', Helvetica, Arial, sans-serif;
           font-size: 0.65rem;
           font-weight: 700;
           letter-spacing: 0.04em;
@@ -2109,7 +2109,7 @@ export default function Home() {
                   {nameColor.code}
                 </div>
                 <div style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: "var(--font-advercase), 'Cormorant Garamond', serif",
                   fontStyle: "italic",
                   fontSize: "0.85rem",
                   color: "#888",
