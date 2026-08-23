@@ -19,7 +19,7 @@ export default function ExperiencePage({ params }: { params: Promise<{ slug: str
 
         :root { --bg: #F8F6F0; --ink: #1A1A18; --subtle: #9A9088; }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: var(--bg); color: var(--ink); font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
+        body { background: var(--bg); color: var(--ink); font-family: var(--font-advercase), 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
 
         .back-bar {
           position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -59,7 +59,7 @@ export default function ExperiencePage({ params }: { params: Promise<{ slug: str
           background: #fff; padding: 2rem 2.5rem 2.5rem;
         }
         .chip-company {
-          font-family: 'Bebas Neue', sans-serif;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif;
           font-size: clamp(1.8rem, 3.5vw, 2.8rem);
           letter-spacing: 0.03em; line-height: 1; color: var(--ink);
           margin-bottom: 0.4rem;
@@ -140,7 +140,7 @@ export default function ExperiencePage({ params }: { params: Promise<{ slug: str
           letter-spacing: 0.1em; text-transform: uppercase; color: #aaa;
         }
         .related-name {
-          font-family: 'Bebas Neue', sans-serif; font-size: 0.95rem;
+          font-family: var(--font-advercase), 'Bebas Neue', sans-serif; font-size: 0.95rem;
           letter-spacing: 0.04em; line-height: 1.15; color: var(--ink);
           margin-top: 1px;
         }
