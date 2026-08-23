@@ -138,7 +138,11 @@ export async function POST(req: NextRequest) {
             from: `"Portfolio Contact" <${process.env.GMAIL_USER}>`,
             to: "christopherbowers28@gmail.com",
             replyTo: email,
-            subject: `New message from ${name} · ${colorName}`.slice(0, 160),
+            // Strip CR/LF before it reaches a header — defense-in-depth against
+            // email header injection (nodemailer also guards this).
+            subject: `New message from ${name} · ${colorName}`
+                .replace(/[\r\n]+/g, " ")
+                .slice(0, 160),
             html: `
       <div style="font-family: Georgia, serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; background: #F2EFE4;">
         <p style="font-family: monospace; font-size: 11px; letter-spacing: 3px; color: #9a9088; margin-bottom: 4px;">PORTFOLIO CONTACT</p>
