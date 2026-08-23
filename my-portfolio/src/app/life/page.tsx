@@ -1,13 +1,9 @@
 import Link from "next/link";
+import BikeStats from "./BikeStats";
 
-// "Full Spectrum", the personal / off-the-clock page. Placeholder copy for now;
-// Christopher will fill in cycling, charity work, and other interests.
+// "Full Spectrum", the personal / off-the-clock page. Cycling is live from
+// Strava (see <BikeStats />); the remaining facets are placeholder copy for now.
 const FACETS = [
-    {
-        label: "On the Bike",
-        color: "#E5442E",
-        body: "Placeholder: your cycling. The riding you do, routes or races, weekly mileage, and what it gives you.",
-    },
     {
         label: "Giving Back",
         color: "#2A6E3F",
@@ -85,7 +81,7 @@ export default function LifePage() {
 
         .facets-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 1.25rem;
         }
         .facet-card {
@@ -126,7 +122,9 @@ export default function LifePage() {
                     we&apos;ll fill this in.)
                 </p>
 
-                <div className="facets-grid">
+                <BikeStats />
+
+                <div className="facets-grid" style={{ marginTop: "4.5rem" }}>
                     {FACETS.map((f) => (
                         <div key={f.label} className="facet-card">
                             <div className="facet-stripe" style={{ background: f.color }} />
