@@ -12,4 +12,6 @@ yarn-error.log*
 .vscode/*
 # Local-only Claude Code artifacts
 .backups/
-.claude/
+.claude/*
+# ...but track the shared, committed project settings
+!.claude/settings.json
