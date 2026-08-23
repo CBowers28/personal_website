@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { LIMITS, escapeHtml, isEmail, isSafeColor, sanitizeSubject } from "@/lib/contact-validation";
 
 // ─── Anti-spam / abuse hardening ────────────────────────────────────
 // Layers (all industry-standard for a public contact form):
@@ -18,8 +19,6 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60_000; // 10 minutes
 const MIN_FILL_MS = 2_500;                // faster than this ⇒ almost certainly a bot
 const MAX_FORM_AGE_MS = 60 * 60_000;      // stale/replayed form token
 
-const LIMITS = { name: 100, email: 254, message: 4_000, color: 80 };
-
 // In-memory store. Fine for a single serverless instance / low traffic; swap
 // for Upstash/Redis if this ever runs multi-instance at scale.
 const hits = new Map<string, number[]>();
@@ -35,19 +34,6 @@ function rateLimited(ip: string): boolean {
     }
     return recent.length > RATE_LIMIT_MAX;
 }
-
-function escapeHtml(s: string): string {
-    return s
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-const isEmail = (s: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
-// Only allow the color values our own client produces (hsl(...) or #hex).
-const isSafeColor = (s: string) => /^(#[0-9a-fA-F]{3,8}|hsl\(\s*\d{1,3}\s*,\s*\d{1,3}%\s*,\s*\d{1,3}%\s*\))$/.test(s);
 
 function clientIp(req: NextRequest): string {
     const fwd = req.headers.get("x-forwarded-for");
@@ -140,9 +126,7 @@ export async function POST(req: NextRequest) {
             replyTo: email,
             // Strip CR/LF before it reaches a header — defense-in-depth against
             // email header injection (nodemailer also guards this).
-            subject: `New message from ${name} · ${colorName}`
-                .replace(/[\r\n]+/g, " ")
-                .slice(0, 160),
+            subject: sanitizeSubject(name, colorName),
             html: `
       <div style="font-family: Georgia, serif; max-width: 480px; margin: 0 auto; padding: 32px 24px; background: #F2EFE4;">
         <p style="font-family: monospace; font-size: 11px; letter-spacing: 3px; color: #9a9088; margin-bottom: 4px;">PORTFOLIO CONTACT</p>
