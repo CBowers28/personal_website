@@ -20,31 +20,6 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Strava / cycling graph (the `/life` page)
-
-The **On the Bike** panel on `/life` shows live cycling stats — total distance,
-elevation, a 12-week mileage bar chart, and recent rides — pulled from the
-Strava API. Without credentials it renders representative **sample data** and
-labels itself as such, so nothing breaks locally or on preview deploys.
-
-To wire it up to a real Strava account, set three server-side env vars (locally
-in `.env.local`, and in the Vercel project settings for production):
-
-```bash
-STRAVA_CLIENT_ID=...       # from https://www.strava.com/settings/api
-STRAVA_CLIENT_SECRET=...   # same page
-STRAVA_REFRESH_TOKEN=...   # a refresh token with activity:read_all scope
-```
-
-Getting the refresh token once (full instructions are in
-`src/lib/strava.ts`): create an API application, authorize it in the browser
-with `scope=activity:read_all` to capture a `code`, then exchange that `code`
-at `https://www.strava.com/oauth/token` for a `refresh_token`. The refresh
-token is long-lived; the app mints short-lived access tokens on demand.
-
-Data is cached server-side (~15 min) to stay well inside Strava's rate limits,
-and the client re-polls every 5 minutes so the graph stays current.
-
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
