@@ -1731,7 +1731,6 @@ export default function Home() {
           <ul className="nav-links">
             <li><a href="#projects">Projects</a></li>
             <li><a href="#process">Timeline</a></li>
-            <li><Link href="/life">Life</Link></li>
             <li><a href="#writing">Writing</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
