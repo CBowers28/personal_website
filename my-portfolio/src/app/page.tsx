@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { PROJECTS, COLLECTIONS } from "@/lib/projects";
-import { PUBLISHED_POSTS, formatPostDate } from "@/lib/posts";
+import { PUBLISHED_CURRENTLY } from "@/lib/currently";
 
 // ─── Pantone Palette ────────────────────────────────────────────────
 // Hero cycling colors, vivid & bright
@@ -103,6 +103,14 @@ const ArrowUpRight = () => (
          strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="7" y1="17" x2="17" y2="7" />
       <polyline points="9 7 17 7 17 15" />
+    </svg>
+);
+// Two overlapping paint drops with a blended center — the "currently mixing" mark.
+const MixIcon = () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="9" cy="14" r="6" />
+      <circle cx="15" cy="9" r="6" />
     </svg>
 );
 
@@ -495,6 +503,172 @@ export default function Home() {
           font-style: italic;
         }
 
+        /* ── CURRENTLY MIXING ── */
+        .mixing-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          color: var(--subtle);
+        }
+        .mixing-kicker svg { animation: mixSpin 9s linear infinite; }
+        @keyframes mixSpin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+
+        .mixing-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.75rem;
+        }
+
+        .mixing-card {
+          display: flex;
+          flex-direction: column;
+          text-decoration: none;
+          color: inherit;
+          background: #fff;
+          box-shadow: 4px 4px 0 rgba(0,0,0,0.10), 10px 14px 34px rgba(0,0,0,0.09);
+          transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.28s;
+        }
+        .mixing-card.is-link:hover {
+          transform: translateY(-8px);
+          box-shadow: 4px 4px 0 rgba(0,0,0,0.12), 18px 28px 52px rgba(0,0,0,0.16);
+        }
+
+        /* The "wet on the palette" swatch — a two-tone mix that keeps shifting. */
+        .mixing-color {
+          height: 210px;
+          position: relative;
+          overflow: hidden;
+          background-size: 200% 200%;
+          animation: mixShift 8s ease-in-out infinite;
+        }
+        @keyframes mixShift {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .mixing-color::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 55%);
+          pointer-events: none;
+        }
+
+        .mixing-wet {
+          position: absolute;
+          top: 1.1rem;
+          left: 1.1rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.58rem;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          background: rgba(255,255,255,0.22);
+          backdrop-filter: blur(4px);
+          color: #fff;
+          padding: 3px 9px 3px 7px;
+          border-radius: 2px;
+          z-index: 1;
+        }
+        .mixing-wet-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #fff;
+          animation: mixPulse 1.8s ease-in-out infinite;
+        }
+        @keyframes mixPulse {
+          0%, 100% { opacity: 0.35; transform: scale(0.8); }
+          50%      { opacity: 1;    transform: scale(1.15); }
+        }
+
+        .mixing-stage {
+          position: absolute;
+          top: 1.1rem;
+          right: 1.1rem;
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          background: rgba(255,255,255,0.2);
+          backdrop-filter: blur(4px);
+          color: #fff;
+          padding: 3px 9px;
+          border-radius: 2px;
+          z-index: 1;
+        }
+
+        .mixing-label {
+          padding: 1.4rem 1.5rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+        }
+        .mixing-brand {
+          font-family: 'Bebas Neue', sans-serif;
+          font-size: 0.75rem;
+          letter-spacing: 0.25em;
+          color: #b0a89c;
+          margin-bottom: 0.2rem;
+        }
+        .mixing-name {
+          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-size: 1.15rem;
+          font-weight: 700;
+          letter-spacing: -0.01em;
+          text-transform: uppercase;
+          line-height: 1.15;
+          color: var(--ink);
+        }
+        .mixing-desc {
+          font-size: 0.95rem;
+          line-height: 1.45;
+          color: #777;
+          font-style: italic;
+          margin-top: 0.5rem;
+        }
+        .mixing-tech {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.4rem;
+          margin-top: 1rem;
+        }
+        .mixing-tech-chip {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.55rem;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+          color: var(--subtle);
+          border: 1px solid rgba(26,26,24,0.12);
+          padding: 0.2rem 0.5rem;
+          border-radius: 2px;
+        }
+        .mixing-foot {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 1.1rem;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(26,26,24,0.08);
+        }
+        .mixing-code {
+          font-family: 'Space Mono', monospace;
+          font-size: 0.6rem;
+          color: #aaa;
+          letter-spacing: 0.05em;
+        }
+        .mixing-arrow {
+          color: var(--subtle);
+          display: inline-flex;
+          transition: transform 0.2s, color 0.2s;
+        }
+        .mixing-card.is-link:hover .mixing-arrow { transform: translate(3px, -3px); color: var(--ink); }
+
         /* ── HERO STAPLES ── */
         .staples-grid {
           display: grid;
@@ -835,116 +1009,6 @@ export default function Home() {
           letter-spacing: 0.06em;
           text-transform: none;
           color: var(--subtle);
-        }
-
-        /* ── BEYOND THE COLORS (writing) ── */
-        .writing-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 1.25rem;
-        }
-
-        .post-card {
-          display: flex;
-          flex-direction: column;
-          text-decoration: none;
-          color: inherit;
-          background: #fff;
-          border: 1.5px solid rgba(26,26,24,0.08);
-          overflow: hidden;
-          transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.25s, border-color 0.25s;
-        }
-        .post-card:hover {
-          transform: translateY(-5px);
-          border-color: rgba(26,26,24,0.16);
-          box-shadow: 0 16px 40px rgba(0,0,0,0.10);
-        }
-
-        .post-stripe { height: 8px; width: 100%; }
-
-        .post-body {
-          padding: 1.6rem 1.7rem 1.7rem;
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-        }
-
-        .post-kicker {
-          font-family: 'Space Mono', monospace;
-          font-size: 0.6rem;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-          color: var(--subtle);
-          margin-bottom: 0.7rem;
-        }
-
-        .post-title {
-          font-family: 'Bebas Neue', sans-serif;
-          font-size: 1.7rem;
-          letter-spacing: 0.02em;
-          line-height: 1.02;
-          color: var(--ink);
-          margin-bottom: 0.6rem;
-        }
-
-        .post-excerpt {
-          font-size: 1.02rem;
-          line-height: 1.55;
-          color: #777;
-          font-style: italic;
-          flex: 1;
-        }
-
-        .post-foot {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-top: 1.2rem;
-          padding-top: 0.9rem;
-          border-top: 1px solid rgba(26,26,24,0.08);
-          font-family: 'Space Mono', monospace;
-          font-size: 0.62rem;
-          letter-spacing: 0.06em;
-          color: var(--subtle);
-        }
-        .post-foot .post-read { display: flex; align-items: center; gap: 0.5rem; color: var(--ink); }
-        .post-card:hover .post-foot .post-read svg { transform: translate(3px, -3px); }
-        .post-foot .post-read svg { transition: transform 0.2s; }
-
-        .writing-empty {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          background: #fff;
-          border: 1.5px dashed rgba(26,26,24,0.18);
-          padding: 2rem 2.25rem;
-        }
-        .writing-empty-chip {
-          width: 56px;
-          height: 56px;
-          flex-shrink: 0;
-          border-radius: 3px;
-          background: repeating-linear-gradient(
-            135deg,
-            rgba(26,26,24,0.06) 0 10px,
-            rgba(26,26,24,0.02) 10px 20px
-          );
-          border: 1px solid rgba(26,26,24,0.1);
-        }
-        .writing-empty-title {
-          font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-          font-size: 0.95rem;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 0.02em;
-          color: var(--ink);
-        }
-        .writing-empty-sub {
-          font-size: 1.05rem;
-          font-style: italic;
-          color: #888;
-          margin-top: 0.35rem;
-          max-width: 520px;
         }
 
         /* ── COLORS OVER TIME (chromatic timeline) ── */
@@ -1615,6 +1679,7 @@ export default function Home() {
         @media (max-width: 1024px) {
           .swatches-grid { grid-template-columns: repeat(2, 1fr); }
           .key-grid     { grid-template-columns: repeat(2, 1fr); }
+          .mixing-grid  { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* ─── TABLET / LARGE PHONE ─── */
@@ -1668,6 +1733,9 @@ export default function Home() {
           .staples-grid { grid-template-columns: 1fr; gap: 1.25rem; }
           .staple-color { height: 220px; }
 
+          /* CURRENTLY MIXING, single column on phones */
+          .mixing-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+
           /* COLLECTIONS, stack header + move count/chevron under text */
           .collection-head { flex-wrap: wrap; }
           .collection-meta { padding: 1.2rem 1.25rem 0.6rem; flex-basis: calc(100% - 12px); }
@@ -1676,9 +1744,6 @@ export default function Home() {
           .collection-item { gap: 0.75rem; }
           .collection-item-tag { display: none; }
           .collection-intro { font-size: 1rem; }
-
-          /* WRITING, single column on phones */
-          .writing-grid { grid-template-columns: 1fr; gap: 1rem; }
 
           /* TRANSIT MAP, hidden on mobile entirely; legend list only */
           .timeline-desktop { display: none; }
@@ -1729,9 +1794,9 @@ export default function Home() {
         <nav>
           <a href="#" className="nav-logo">CHRISTOPHER BOWERS</a>
           <ul className="nav-links">
+            <li><a href="#currently">Currently</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#process">Timeline</a></li>
-            <li><a href="#writing">Writing</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
         </nav>
@@ -1763,6 +1828,53 @@ export default function Home() {
               <a href="https://linkedin.com/in/christopherjbowers" className="btn btn-outline" target="_blank">LinkedIn ↗</a>
               <a href="https://github.com/CBowers28" className="btn btn-outline" target="_blank">GitHub ↗</a>
             </div>
+          </div>
+        </section>
+
+        {/* CURRENTLY MIXING, active work-in-progress, kept up top */}
+        <section id="currently">
+          <div className="section-label">
+            <span className="mixing-kicker"><MixIcon /> On the Palette</span>
+          </div>
+          <div className="section-title">CURRENTLY MIXING</div>
+          <p className="section-lede">
+            The colors still wet on the palette, the projects I&apos;m actively
+            building right now.
+          </p>
+
+          <div className="mixing-grid">
+            {PUBLISHED_CURRENTLY.map((c) => {
+              const inner = (
+                  <>
+                    <div
+                        className="mixing-color"
+                        style={{ background: `linear-gradient(120deg, ${c.mix.from}, ${c.mix.to})` }}
+                    >
+                      <span className="mixing-wet"><span className="mixing-wet-dot" />Mixing</span>
+                      <span className="mixing-stage">{c.stage}</span>
+                    </div>
+                    <div className="mixing-label">
+                      <div className="mixing-brand">Pantone® · In Progress</div>
+                      <div className="mixing-name">{c.name}</div>
+                      <div className="mixing-desc">{c.blurb}</div>
+                      <div className="mixing-tech">
+                        {c.tech.map((t) => (
+                            <span key={t} className="mixing-tech-chip">{t}</span>
+                        ))}
+                      </div>
+                      <div className="mixing-foot">
+                        <span className="mixing-code">{c.code} · {c.colorName}</span>
+                        {c.link && <span className="mixing-arrow"><ArrowUpRight /></span>}
+                      </div>
+                    </div>
+                  </>
+              );
+              return c.link ? (
+                  <Link key={c.slug} href={c.link} className="mixing-card is-link">{inner}</Link>
+              ) : (
+                  <div key={c.slug} className="mixing-card">{inner}</div>
+              );
+            })}
           </div>
         </section>
 
@@ -2054,44 +2166,6 @@ export default function Home() {
               </div>
             </div>
         )}
-
-        {/* BEYOND THE COLORS, writing / opinion (LaTeX PDF pieces) */}
-        <section id="writing">
-          <div className="section-label">Off the Swatch</div>
-          <div className="section-title">BEYOND THE COLORS</div>
-          <p className="section-lede">
-            Essays and opinions on the work, where the metric should be,
-            what a system owes the people who depend on it, and the odd tangent.
-          </p>
-          {PUBLISHED_POSTS.length > 0 ? (
-              <div className="writing-grid">
-                {PUBLISHED_POSTS.map((post) => (
-                    <a key={post.slug} href={post.pdf} target="_blank" rel="noreferrer" className="post-card">
-                      <div className="post-stripe" style={{ background: post.color.hex }} />
-                      <div className="post-body">
-                        <div className="post-kicker">{post.kicker}</div>
-                        <div className="post-title">{post.title}</div>
-                        <div className="post-excerpt">{post.excerpt}</div>
-                        <div className="post-foot">
-                          <span>{formatPostDate(post.date)}</span>
-                          <span className="post-read">Read PDF <ArrowUpRight /></span>
-                        </div>
-                      </div>
-                    </a>
-                ))}
-              </div>
-          ) : (
-              <div className="writing-empty">
-                <div className="writing-empty-chip" />
-                <div>
-                  <div className="writing-empty-title">No pieces mixed yet</div>
-                  <div className="writing-empty-sub">
-                    Essays and opinion pieces will land here soon, this is where the writing lives.
-                  </div>
-                </div>
-              </div>
-          )}
-        </section>
 
         {/* CONTACT */}
         <section id="contact" style={{ background: "rgba(0,0,0,0.02)" }}>
